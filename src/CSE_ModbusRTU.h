@@ -1,0 +1,258 @@
+
+//======================================================================================//
+/**
+ * @file CSE_ModbusRTU.h
+ * @brief Main header file for the CSE_ModbusRTU library.
+ * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
+ * @version 0.0.1
+ * @author Vishnu Mohanan (@vishnumaiea)
+ * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+ * @par MIT License
+ * 
+ */
+//======================================================================================//
+
+#define   MODBUS_RTU_SERIAL_PORT_OBJECT   RS485Class
+
+#if (MODBUS_RTU_SERIAL_PORT_OBJECT == RS485Class)
+  #include <CSE_ArduinoRS485.h>
+#endif
+
+#include <vector>
+
+//======================================================================================//
+
+#define   MODBUS_RTU_ADU_LENGTH_MAX                     256
+#define   MODBUS_RTU_PDU_LENGTH_MAX                     253
+#define   MODBUS_RTU_ADDR_LENGTH_MAX                    2
+#define   MODBUS_RTU_CRC_LENGTH                         2
+#define   MODBUS_RTU_ADU_ADDRESS_INDEX                  0
+#define   MODBUS_RTU_ADU_FUNCTION_CODE_INDEX            1
+#define   MODBUS_RTU_ADU_EXCEPTION_CODE_INDEX           2
+#define   MODBUS_RTU_ADU_DATA_LENGTH_MAX                252  // Doesn't include the function code
+#define   MODBUS_RTU_ADU_DATA_INDEX                     2
+#define   MODBUS_RTU_COIL_COUNT_MAX                     100
+#define   MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX           100
+#define   MODBUS_RTU_INPUT_REGISTER_COUNT_MAX           100
+#define   MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX         100
+
+#define   MODBUS_FC_READ_COILS                          0x01
+#define   MODBUS_FC_READ_DISCRETE_INPUTS                0x02
+#define   MODBUS_FC_READ_HOLDING_REGISTERS              0x03
+#define   MODBUS_FC_READ_INPUT_REGISTERS                0x04
+#define   MODBUS_FC_WRITE_SINGLE_COIL                   0x05
+#define   MODBUS_FC_WRITE_SINGLE_REGISTER               0x06
+#define   MODBUS_FC_READ_EXCEPTION_STATUS               0x07
+#define   MODBUS_FC_WRITE_MULTIPLE_COILS                0x0F
+#define   MODBUS_FC_WRITE_MULTIPLE_REGISTERS            0x10
+#define   MODBUS_FC_REPORT_SERVER_ID                    0x11
+#define   MODBUS_FC_MASK_WRITE_REGISTER                 0x16
+#define   MODBUS_FC_WRITE_AND_READ_REGISTERS            0x17
+
+#define   MODBUS_EX_ILLEGAL_FUNCTION                    0x01
+#define   MODBUS_EX_ILLEGAL_DATA_ADDRESS                0x02
+#define   MODBUS_EX_ILLEGAL_DATA_VALUE                  0x03
+#define   MODBUS_EX_SERVER_DEVICE_FAILURE               0x04
+#define   MODBUS_EX_ACKNOWLEDGE                         0x05
+#define   MODBUS_EX_SERVER_DEVICE_BUSY                  0x06
+#define   MODBUS_EX_NEGATIVE_ACKNOWLEDGE                0x07
+#define   MODBUS_EX_MEMORY_PARITY_ERROR                 0x08
+#define   MODBUS_EX_GATEWAY_PATH_UNAVAILABLE            0x0A
+#define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0B
+
+#define DEBUG_SERIAL Serial
+
+//======================================================================================//
+
+class CSE_ModbusRTU_ADU;
+class CSE_ModbusRTU;
+class CSE_ModbusRTU_Server;
+class CSE_ModbusRTU_Client;
+
+//======================================================================================//
+/**
+ * @brief A generic class to store a Modbus RTU ADU (Application Data Unit).
+ * 
+ */
+class CSE_ModbusRTU_ADU {
+  private:
+    uint8_t aduBuffer [MODBUS_RTU_ADU_LENGTH_MAX];  // The ADU buffer for transmitting
+    uint8_t aduLength;  // The number of valid bytes in the receive ADU buffer
+
+  public:
+    enum aduType_t {
+      NONE,
+      REQUEST,
+      RESPONSE,
+      EXCEPTION
+    } aduType;  // The type of ADU
+    
+    CSE_ModbusRTU_ADU();
+
+    bool resetLength(); // Reset the ADU length to 0
+    uint8_t getLength(); // Get the ADU length
+
+    bool clear(); // Clear the ADU buffer by setting all bytes to 0x00
+    bool clear (uint8_t index); // Clear a byte in the ADU buffer by setting it to 0x00
+    bool clear (uint8_t index, uint8_t length); // Clear a range of bytes in the ADU buffer by setting them to 0x00
+
+    bool add (uint8_t byte); // Add a byte to the ADU buffer
+    bool add (uint8_t* buffer, uint8_t length); // Add a buffer of bytes to the ADU buffer
+    bool add (uint16_t word); // Add a word to the ADU buffer
+    bool add (uint16_t* buffer, uint8_t length); // Add a buffer of words to the ADU buffer
+
+    bool checkCRC(); // Check the CRC of the ADU buffer
+    uint16_t calculateCRC(); // Calculate the CRC of the ADU
+
+    bool setType (int type); // Set the type of the ADU
+    bool setDeviceAddress (uint8_t address); // Set the device address of the ADU
+    bool setFunctionCode (uint8_t functionCode); // Set the function code of the ADU
+    bool setException(); // Convert the function code to an exception
+    bool setExceptionCode (uint8_t exceptionCode); // Set the exception code of the ADU
+    bool setData (uint8_t* buffer, uint8_t length); // Set the data of the ADU
+    uint16_t setCRC(); // Calculate the CRC of the ADU and add it to the buffer
+
+    uint8_t getDeviceAddress(); // Get the device address of the ADU
+    uint8_t getFunctionCode(); // Get the function code of the ADU
+    uint8_t getExceptionCode(); // Get the exception code of the ADU
+    uint16_t getStartingAddress(); // Get the starting address of the ADU
+    uint16_t getQuantity(); // Get the quantity (register count) of the ADU
+    uint16_t getCRC(); // Get the CRC of the ADU
+    uint8_t getDataLength(); // Get the data length of the ADU
+    int getType(); // Get the type of the ADU
+
+    uint8_t getByte (uint8_t index); // Get a byte from the ADU buffer
+    uint16_t getWord (uint8_t index); // Get a word from the ADU buffer
+};
+
+//======================================================================================//
+/**
+ * @brief Generic Modbus RTU class. Implements common functions and data structures
+ * needed for both Modbus RTU server and client.
+ * 
+ */
+class CSE_ModbusRTU {
+  private:
+    // friend class CSE_ModbusRTU_Server;
+    // friend class CSE_ModbusRTU_Client;
+
+    bool setServer (CSE_ModbusRTU_Server& server);
+    bool setClient (CSE_ModbusRTU_Client& client);
+
+    String name; // The name of the Modbus RTU object
+
+  public:
+    int receive (CSE_ModbusRTU_ADU& adu);  // Receive a custom Modbus RTU packet
+    int send (CSE_ModbusRTU_ADU& adu); // Send a custom Modbus RTU packet
+
+    /**
+     * @brief This typedef defines the serial port object used for Modbus RTU communication.
+     * It can be any object that implements the following methods:
+     * - begin (baudrate)
+     * - available ()
+     * - read ()
+     * - write (byte)
+     * - flush ()
+     * - peek ()
+     * - end ()
+     */
+    typedef MODBUS_RTU_SERIAL_PORT_OBJECT* serialPort_t;
+
+    serialPort_t serialPort; // The serial port used for Modbus RTU communication
+
+    uint8_t deviceAddress; // The Modbus RTU device id (1-247). Can be client or server.
+    uint8_t remoteDeviceAddress; // The remote Modbus RTU device id (1-247). Can be client or server.
+
+    // You can have only one server or client per RTU.
+    // If you want to have multiple servers or clients, you need to create multiple RTUs.
+    // It is possible to have client and server at the same time.
+    // But it's up to you to manage their roles and communication.
+    CSE_ModbusRTU_Server* server; // Pointer to the server object connected to this RTU
+    CSE_ModbusRTU_Client* client; // Pointer to the client object connected to this RTU
+
+    CSE_ModbusRTU (serialPort_t serialPort, uint8_t deviceAddress, String name);
+    String getName();
+};
+
+//======================================================================================//
+
+class modbus_bit_t {
+  public:
+    uint16_t address;
+    uint8_t value;
+
+    modbus_bit_t (uint16_t address, uint8_t value) {
+      this->address = address;
+      this->value = value;
+    }
+};
+
+//======================================================================================//
+
+class modbus_register_t {
+  public:
+    uint16_t address;
+    uint16_t value;
+
+    modbus_register_t (uint16_t address, uint16_t value) {
+      this->address = address;
+      this->value = value;
+    }
+};
+
+//======================================================================================//
+
+class CSE_ModbusRTU_Server {
+  private:
+    String name;
+    CSE_ModbusRTU* rtu;
+
+  public:
+    std::vector <modbus_bit_t> coils;
+    std::vector <modbus_bit_t> discreteInputs;
+    std::vector <modbus_register_t> holdingRegisters;
+    std::vector <modbus_register_t> inputRegisters;
+
+    CSE_ModbusRTU_ADU request; // The request ADU
+    CSE_ModbusRTU_ADU response; // The response ADU
+
+    CSE_ModbusRTU_Server (CSE_ModbusRTU& rtu, String name);
+
+    String getName();
+
+    bool begin();
+    int poll();
+    int receive();
+    int send();
+
+    bool configureCoils (uint16_t startAddress, uint16_t count); // Create and add new coils to the server
+    bool configureDiscreteInputs (uint16_t address, uint16_t count); // Create and add new discrete inputs to the server
+    bool configureInputRegisters (uint16_t address, uint16_t count); // Create and add new input registers to the server
+    bool configureHoldingRegisters (uint16_t address, uint16_t count); // Create and add new holding registers to the server
+
+    int readCoil (uint16_t address); // Read a single coil from the server itself
+    int writeCoil (uint16_t address, uint8_t value); // Write a single coil to the server itself
+    int writeCoil (uint16_t address, uint8_t value, uint16_t count); // Write multiple coils to the server itself
+    bool isCoilPresent (uint16_t address); // Check if a coil is present in the server
+    bool isCoilPresent (uint16_t address, uint16_t count); // Check if multiple coils are present in the server
+
+    int readDiscreteInput (uint16_t address); // Read a single discrete input from the server itself
+    int writeDiscreteInput (uint16_t address, uint8_t value); // Write a single discrete input to the server itself
+    int writeDiscreteInput (uint16_t address, uint8_t value, uint16_t count); // Write multiple discrete inputs to the server itself
+    bool isDiscreteInputPresent (uint16_t address); // Check if a discrete input is present in the server
+    bool isDiscreteInputPresent (uint16_t address, uint16_t count); // Check if multiple discrete inputs are present in the server
+
+    int readInputRegister (uint16_t address); // Read a single input register from the server itself
+    int writeInputRegister (uint16_t address, uint16_t value); // Write a single input register to the server itself
+    int writeInputRegister (uint16_t address, uint16_t value, uint16_t count); // Write multiple input registers to the server itself
+    bool isInputRegisterPresent (uint16_t address); // Check if an input register is present in the server
+    bool isInputRegisterPresent (uint16_t address, uint16_t count); // Check if multiple input registers are present in the server
+
+    int readHoldingRegister (uint16_t address); // Read a single holding register from the server itself
+    int writeHoldingRegister (uint16_t address, uint16_t value); // Write a single holding register to the server itself
+    int writeHoldingRegister (uint16_t address, uint16_t value, uint16_t count); // Write multiple holding registers to the server itself
+    bool isHoldingRegisterPresent (uint16_t address); // Check if a holding register is present in the server
+    bool isHoldingRegisterPresent (uint16_t address, uint16_t count); // Check if multiple holding registers are present in the server
+};
+
+//======================================================================================//

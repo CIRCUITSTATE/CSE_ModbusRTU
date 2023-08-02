@@ -1,0 +1,34 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+CSE_GNSS KEYWORD1
+NMEA_0183_Data   KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+parse                   KEYWORD2
+print                   KEYWORD2
+set                   KEYWORD2
+check                   KEYWORD2
+find                   KEYWORD2
+count                   KEYWORD2
+getDataIndex                   KEYWORD2
+begin                   KEYWORD2
+read                   KEYWORD2
+addData                   KEYWORD2
+getDataCount                   KEYWORD2
+getDataRef                   KEYWORD2
+
+######################################
+# Constants (LITERAL1)
+#######################################
+
+PT_MODE_ONESHOT   LITERAL1
+
