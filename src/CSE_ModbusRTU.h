@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.h
  * @brief Main header file for the CSE_ModbusRTU library.
  * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.1
+ * @version 0.0.2
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -12,16 +12,19 @@
  */
 //======================================================================================//
 
+#include <vector>
+
+// You can define the type of serial port to use for the Modbus RTU node here.
 #define   MODBUS_RTU_SERIAL_PORT_OBJECT   RS485Class
 
+// Make a library selection based on the type of serial port selected.
 #if (MODBUS_RTU_SERIAL_PORT_OBJECT == RS485Class)
   #include <CSE_ArduinoRS485.h>
 #endif
 
-#include <vector>
-
 //======================================================================================//
 
+// Modbus constants and limits
 #define   MODBUS_RTU_ADU_LENGTH_MAX                     256
 #define   MODBUS_RTU_PDU_LENGTH_MAX                     253
 #define   MODBUS_RTU_ADDR_LENGTH_MAX                    2
@@ -36,6 +39,7 @@
 #define   MODBUS_RTU_INPUT_REGISTER_COUNT_MAX           100
 #define   MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX         100
 
+// Modbus function codes
 #define   MODBUS_FC_READ_COILS                          0x01
 #define   MODBUS_FC_READ_DISCRETE_INPUTS                0x02
 #define   MODBUS_FC_READ_HOLDING_REGISTERS              0x03
@@ -49,6 +53,7 @@
 #define   MODBUS_FC_MASK_WRITE_REGISTER                 0x16
 #define   MODBUS_FC_WRITE_AND_READ_REGISTERS            0x17
 
+// Modbus exception codes
 #define   MODBUS_EX_ILLEGAL_FUNCTION                    0x01
 #define   MODBUS_EX_ILLEGAL_DATA_ADDRESS                0x02
 #define   MODBUS_EX_ILLEGAL_DATA_VALUE                  0x03
@@ -60,9 +65,11 @@
 #define   MODBUS_EX_GATEWAY_PATH_UNAVAILABLE            0x0A
 #define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0B
 
-#define DEBUG_SERIAL Serial
+// You can change the seril port for debug messages here
+#define   MODBUS_DEBUG_SERIAL      Serial
 
 //======================================================================================//
+// Forward declarations
 
 class CSE_ModbusRTU_ADU;
 class CSE_ModbusRTU;
@@ -175,7 +182,11 @@ class CSE_ModbusRTU {
 };
 
 //======================================================================================//
-
+/**
+ * @brief A custom type for storing Modbus RTU bits. It can be used for coils and
+ * discrete inputs.
+ * 
+ */
 class modbus_bit_t {
   public:
     uint16_t address;
@@ -188,7 +199,11 @@ class modbus_bit_t {
 };
 
 //======================================================================================//
-
+/**
+ * @brief A custom type for storing Modbus RTU registers. It can be used for holding
+ * registers and input registers.
+ * 
+ */
 class modbus_register_t {
   public:
     uint16_t address;
@@ -201,30 +216,40 @@ class modbus_register_t {
 };
 
 //======================================================================================//
-
+/**
+ * @brief Implments the Modbus RTU server node. You first need to create an instance of
+ * CSE_ModbusRTU class and then pass it to the constructor of this class. Since the server
+ * is what maintains the data, you can access and modify Modbus data with this class.
+ * 
+ */
 class CSE_ModbusRTU_Server {
   private:
-    String name;
-    CSE_ModbusRTU* rtu;
+    String name;  // The name of the server
+    CSE_ModbusRTU* rtu; // The parent RTU object
 
   public:
+    // The following vectors store the Modbus data.
     std::vector <modbus_bit_t> coils;
     std::vector <modbus_bit_t> discreteInputs;
     std::vector <modbus_register_t> holdingRegisters;
     std::vector <modbus_register_t> inputRegisters;
 
+    // There are two ADUs, one for request and one for response.
+    // request is used to receive data from the client.
+    // and response is used to send data to the client.
     CSE_ModbusRTU_ADU request; // The request ADU
     CSE_ModbusRTU_ADU response; // The response ADU
 
     CSE_ModbusRTU_Server (CSE_ModbusRTU& rtu, String name);
 
-    String getName();
+    String getName(); // Returns the name of the server
 
-    bool begin();
-    int poll();
-    int receive();
-    int send();
+    bool begin(); // Does nothing for now.
+    int poll(); // Listen for incoming requests and process them
+    int receive(); // Receive a request from the client
+    int send(); // Send a response to the client
 
+    // The following functions are used to configure and read Modbus data.
     bool configureCoils (uint16_t startAddress, uint16_t count); // Create and add new coils to the server
     bool configureDiscreteInputs (uint16_t address, uint16_t count); // Create and add new discrete inputs to the server
     bool configureInputRegisters (uint16_t address, uint16_t count); // Create and add new input registers to the server

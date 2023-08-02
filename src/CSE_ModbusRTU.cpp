@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
  * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.1
+ * @version 0.0.2
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -28,12 +28,12 @@ CSE_ModbusRTU_ADU::CSE_ModbusRTU_ADU() {
 /**
  * @brief Resets the aduLength to 0 without clearing any data on the buffer. This is
  * useful for a faster write to the buffer without waiting for the buffer to be cleared.
- * Resetting the aduLength will prvent you from doing any operation on the buffer even
+ * Resetting the aduLength will prevent you from doing any operation on the buffer even
  * if it has valid data. So use this function with caution, and only before you start
  * writing to the buffer.
  * 
- * @return true 
- * @return false 
+ * @return true - Operation successful.
+ * @return false - Operation failed.
  */
 bool CSE_ModbusRTU_ADU:: resetLength() {
   aduLength = 0;
@@ -43,9 +43,12 @@ bool CSE_ModbusRTU_ADU:: resetLength() {
 //======================================================================================//
 /**
  * @brief Returns the number of valid bytes in the ADU buffer. A value 0 indicates that
- * the buffer has no valid data even though its contents may not be all 0x00.
+ * the buffer has no valid data even though its contents may not be all 0x00. The aduLength
+ * is a very important variable. It is used to keep track of the number of valid bytes in
+ * ADU buffer. If you change the aduLength manually, you will end up with a corrupted ADU
+ * buffer
  * 
- * @return uint8_t 
+ * @return uint8_t - The current aduLength.
  */
 uint8_t CSE_ModbusRTU_ADU:: getLength() {
   return aduLength;
@@ -143,7 +146,7 @@ bool CSE_ModbusRTU_ADU:: add (uint8_t* buffer, uint8_t length) {
 
 //======================================================================================//
 /**
- * @brief Add a word (16-bit) to the ADU buffer. The new word is written to the end of\
+ * @brief Add a word (16-bit) to the ADU buffer. The new word is written to the end of
  * the buffer indicated by aduLength. The aduLength is incremented by 2.
  * 
  * @param word A 16-bit data word to add.
@@ -155,6 +158,7 @@ bool CSE_ModbusRTU_ADU:: add (uint16_t word) {
     return false;
   }
 
+  // The Hi byte is added first
   aduBuffer [aduLength++] = (uint8_t) (word >> 8);
   aduBuffer [aduLength++] = (uint8_t) (word & 0xFF);
 
@@ -168,7 +172,7 @@ bool CSE_ModbusRTU_ADU:: add (uint16_t word) {
  * the word array times 2.
  * 
  * @param buffer A 16-bit data buffer to add.
- * @param length The number of 16-bit data words to add.
+ * @param length The number of 16-bit data words to add (not the number of bytes)
  * @return true - Operation successful.
  * @return false - Operation failed.
  */
@@ -195,9 +199,9 @@ bool CSE_ModbusRTU_ADU:: add (uint16_t* buffer, uint8_t length) {
  */
 bool CSE_ModbusRTU_ADU:: checkCRC() {
   // If the ADU length is less than 3, that means that the device address, function code,
-  // and data are not set yet. In this case, we can't set the data.
+  // and data are not set yet. In this case, we can't calculate the CRC.
   if (aduLength < 3) {
-    return 0x0000;
+    return false;
   }
 
   uint16_t crc = calculateCRC();
@@ -215,11 +219,11 @@ bool CSE_ModbusRTU_ADU:: checkCRC() {
  * @brief Calculates the CRC of the ADU contents and returns it. If the aduLength is
  * not sufficient to calculate the CRC then 0x00 is returned.
  * 
- * @return uint16_t The CRC of the ADU contents.
+ * @return uint16_t - The CRC of the ADU contents.
  */
 uint16_t CSE_ModbusRTU_ADU:: calculateCRC() {
   // If the ADU length is less than 3, that means that the device address, function code,
-  // and data are not set yet. In this case, we can't set the data.
+  // and data are not set yet. In this case, we can't calculate the CRC.
   if (aduLength < 3) {
     return 0x0000;
   }
@@ -274,9 +278,9 @@ bool CSE_ModbusRTU_ADU:: setType (int type) {
  * if the current length is less than 2. If you set the device address after setting
  * other fields, the ADU length will not be incremented.
  * 
- * @param address Client or server address.
- * @return true Operation successful.
- * @return false Operation failed.
+ * @param address Client or server address (8-bit)
+ * @return true - Operation successful.
+ * @return false - Operation failed.
  */
 bool CSE_ModbusRTU_ADU:: setDeviceAddress (uint8_t address) {
   aduBuffer [MODBUS_RTU_ADU_ADDRESS_INDEX] = address;
@@ -298,8 +302,8 @@ bool CSE_ModbusRTU_ADU:: setDeviceAddress (uint8_t address) {
  * than 2. Ideally, you should set the function code after setting the device address.
  * 
  * @param functionCode Valid function code from 0x01 to 0x7F (1 - 127)
- * @return true Operation successful.
- * @return false Operation failed.
+ * @return true - Operation successful.
+ * @return false - Operation failed.
  */
 bool CSE_ModbusRTU_ADU:: setFunctionCode (uint8_t functionCode) {
   // Valid function code should be from 0x01 to 0x7F.
@@ -328,7 +332,7 @@ bool CSE_ModbusRTU_ADU:: setFunctionCode (uint8_t functionCode) {
  */
 bool CSE_ModbusRTU_ADU:: setExceptionCode (uint8_t exceptionCode) {
   // We will only set the exception code if the device address and function code are already set.
-  // This is because the exception code is always set after the function code.
+  // This is because the exception code always comes after the function code.
   if (aduLength != 2) {
     return false;
   }
@@ -348,8 +352,8 @@ bool CSE_ModbusRTU_ADU:: setExceptionCode (uint8_t exceptionCode) {
  * @brief Convert the function code to an exception by setting the MSB to 1. Will not
  * work if the function code is already an exception (>= 0x80). aduLength is not changed.
  * 
- * @return true 
- * @return false 
+ * @return true - Operation successful.
+ * @return false - Operation failed.
  */
 bool CSE_ModbusRTU_ADU:: setException() {
   // If the ADU length is less than 2, that means that the device address and function code
@@ -394,6 +398,7 @@ bool CSE_ModbusRTU_ADU:: setData (uint8_t* buffer, uint8_t length) {
     return false;
   }
 
+  // Start writing from after the function code field.
   aduLength = MODBUS_RTU_ADU_DATA_INDEX;
 
   for (uint8_t i = 0; i < length; i++) {
@@ -422,6 +427,7 @@ uint16_t CSE_ModbusRTU_ADU:: setCRC() {
 
   uint16_t crc = calculateCRC();
 
+  // CRC is written with Lo byte first, unlike the data field.
   aduBuffer [aduLength++] = (uint8_t) (crc & 0xFF); // Low byte
   aduBuffer [aduLength++] = (uint8_t) (crc >> 8); // High byte
 
@@ -451,19 +457,16 @@ uint8_t CSE_ModbusRTU_ADU:: getFunctionCode() {
 
 //======================================================================================//
 /**
- * @brief Returns the exception code from the ADU. The exception code is found by
- * subtracting 0x80 from the function code. If the ADU type is not an exception,
- * or if the function code is not valid, the function returns 0x00 which is not a
- * valid exception code. The function code has to be greater than 0x80 to be a valid
- * exception code. 
+ * @brief Returns the exception code from the ADU. In a valid exception ADU, the code
+ * comes just after the function code. Only works for ADU  with the type set to
+ * EXCEPTION or the exception bit in the function code is set . So make sure you check
+ * the type before calling this function.
  * 
  * @return uint8_t - The exception code. 0x00 if no valid exception code.
  */
 uint8_t CSE_ModbusRTU_ADU:: getExceptionCode() {
-  if (aduType == aduType_t::EXCEPTION) { // Check if the ADU is an exception
-    if (aduBuffer [MODBUS_RTU_ADU_FUNCTION_CODE_INDEX] > 0x80) { // Check if the exception code is valid
-      return aduBuffer [MODBUS_RTU_ADU_FUNCTION_CODE_INDEX] - 0x80;
-    }
+  if ((aduType == aduType_t:: EXCEPTION) || (aduBuffer [MODBUS_RTU_ADU_FUNCTION_CODE_INDEX] > 0x80)) { // Check if the ADU is an exception
+    return aduBuffer [MODBUS_RTU_ADU_DATA_INDEX];
   }
 
   return 0x00; // No exception code
@@ -483,10 +486,11 @@ uint16_t CSE_ModbusRTU_ADU:: getStartingAddress() {
 
 //======================================================================================//
 /**
- * @brief Returns the quantity field in the ADU. The function only reads the value at
- * the position, and does not guarantee that the value is valid.
+ * @brief Returns the quantity field in the ADU. The quantity is the register count in
+ * most cases. The function only reads the value at the position, and does not guarantee
+ * that the value is valid.
  * 
- * @return uint16_t - The quantity in the ADU.
+ * @return uint16_t - The quantity (register count) in the ADU.
  */
 uint16_t CSE_ModbusRTU_ADU:: getQuantity() {
   // Quantity always comes after the starting address in the data.
@@ -495,11 +499,16 @@ uint16_t CSE_ModbusRTU_ADU:: getQuantity() {
 
 //======================================================================================//
 /**
- * @brief Returns the CRC field from the ADU.
+ * @brief Returns the CRC field from the ADU. Operation fails if the ADU length is less
+ * than 4.
  * 
  * @return uint16_t - CRC value.
  */
 uint16_t CSE_ModbusRTU_ADU:: getCRC() {
+  if (aduLength < 4) {
+    return 0x0000;
+  }
+
   return (uint16_t) (aduBuffer [aduLength - 2] << 8) + aduBuffer [aduLength - 1];
 }
 
@@ -508,11 +517,14 @@ uint16_t CSE_ModbusRTU_ADU:: getCRC() {
  * @brief Returns the length of data field in the ADU. This is the number of bytes
  * after the function code and before the CRC. The length is calculated purely from
  * the aduLength. So if the aduLength is not correct for some reason, the function
- * will return an incorrect value.
+ * will return an incorrect value. The ADU length should be at least 5 bytes.
  * 
  * @return uint8_t - The length of data field in the ADU.
  */
 uint8_t CSE_ModbusRTU_ADU:: getDataLength() {
+  if (aduLength < 5) {
+    return 0x00;
+  }
   // Return the number of bytes in the ADU after device address, function code and CRC
   return (aduLength - MODBUS_RTU_ADU_DATA_INDEX - MODBUS_RTU_CRC_LENGTH); // aduLength - 4
 }
@@ -521,7 +533,7 @@ uint8_t CSE_ModbusRTU_ADU:: getDataLength() {
 /**
  * @brief Returns a single byte from the ADU. The index should be within the aduLength.
  * If the index is not valid (greater than aduLength), the function returns 0x00. So
- * this guarantees that the function will always return a valid byte.
+ * this does not guarantee that the function will always return a valid byte.
  * 
  * @param index The index of the byte to return.
  * @return uint8_t - The byte at the specified index.
@@ -539,14 +551,18 @@ uint8_t CSE_ModbusRTU_ADU:: getByte (uint8_t index) {
 /**
  * @brief Returns the 16-bit word at the specified index. The index should be within
  * the aduLength. If the index is not valid (greater than aduLength), the function
- * returns 0x0000. So this guarantees that the function will always return a valid
+ * returns 0x0000. So this does not guarantee that the function will always return a valid
  * word. Two consecutive bytes are combined to form the word. The index indicates the
- * position of the Hi byte.
+ * position of the Hi byte. The oepration fails if the ADU length is less than 2.
  * 
  * @param index The starting index of the word to return.
  * @return uint16_t - The 16-bit word at the specified index.
  */
 uint16_t CSE_ModbusRTU_ADU:: getWord (uint8_t index) {
+  if (aduLength < 2) {
+    return 0x0000;
+  }
+
   if ((index + 1) < aduLength) {
     return (uint16_t) (aduBuffer [index] << 8) + aduBuffer [index + 1];
   }
@@ -557,9 +573,9 @@ uint16_t CSE_ModbusRTU_ADU:: getWord (uint8_t index) {
 
 //======================================================================================//
 /**
- * @brief Returns the current type of the ADU.
+ * @brief Returns the current type of the ADU. The ADU type is converted to an integer.
  * 
- * @return int The ADU type.
+ * @return int - The ADU type as an integer.
  */
 int CSE_ModbusRTU_ADU:: getType() {
   return aduType;
@@ -568,10 +584,12 @@ int CSE_ModbusRTU_ADU:: getType() {
 //======================================================================================//
 /**
  * @brief Instantiate a new CSE_ModbusRTU object. The device address is the host
- * address. The default request and response ADU types are set to NONE.
+ * address. Serial port can be hardware or software serial port if you are using the
+ * CSE_ArduinoRS485 library.
  * 
  * @param serialPort The serial port to read/write data.
  * @param deviceAddress The 8-bit device address.
+ * @param name The name of the Modbus RTU object.
  * @return CSE_ModbusRTU:: 
  */
 CSE_ModbusRTU:: CSE_ModbusRTU (serialPort_t serialPort, uint8_t deviceAddress, String name) {
@@ -611,9 +629,9 @@ bool CSE_ModbusRTU:: setServer (CSE_ModbusRTU_Server& server) {
  * A client is able to send Modbus RTU requests. You can have only one server and
  * client per Modbus RTU object.
  * 
- * @param client 
- * @return true 
- * @return false 
+ * @param client CSE_ModbusRTU_Client object.
+ * @return true - Operation successful.
+ * @return false - Operation failed.
  */
 bool CSE_ModbusRTU:: setClient (CSE_ModbusRTU_Client& client) {
   this->client = &client;
@@ -627,12 +645,12 @@ bool CSE_ModbusRTU:: setClient (CSE_ModbusRTU_Client& client) {
  * the CRC of the received ADU and return the length of the ADU if the CRC is valid.
  * The address of the ADU is not checked. It has to be checked by the server or client.
  * 
- * @param adu 
- * @return int 
+ * @param adu The ADU object to save the incoming data.
+ * @return int - The ADU length, or -1 if the operation fails.
  */
 int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu) {
   adu.resetLength(); // Reset the ADU length
-  // DEBUG_SERIAL.print (F("receive(): Checking Modbus port.."));
+  // MODBUS_DEBUG_SERIAL.print (F("receive(): Checking Modbus port.."));
   
   uint32_t startTime = millis();
 
@@ -643,30 +661,31 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu) {
     }
   }
 
+  // Print the ADU
   if (adu.getLength() > 0) {
-    DEBUG_SERIAL.print (F("receive(): Received ADU:"));
+    MODBUS_DEBUG_SERIAL.print (F("receive(): Received ADU:"));
     for (int i = 0; i < adu.getLength(); i++) {
-      DEBUG_SERIAL.print (" ");
+      MODBUS_DEBUG_SERIAL.print (" ");
       if (adu.getByte (i) < 0x10) {
-        DEBUG_SERIAL.print (F("0x0"));
+        MODBUS_DEBUG_SERIAL.print (F("0x0"));
       }
       else {
-        DEBUG_SERIAL.print (F("0x"));
+        MODBUS_DEBUG_SERIAL.print (F("0x"));
       }
-      DEBUG_SERIAL.print (adu.getByte (i), HEX);
+      MODBUS_DEBUG_SERIAL.print (adu.getByte (i), HEX);
     }
 
-    DEBUG_SERIAL.println();
+    MODBUS_DEBUG_SERIAL.println();
   }
 
   // Now check if the ADU is valid. We can do this by simply checking the CRC of the ADU.
   if (adu.getLength() > 0) {
     if (adu.checkCRC()) { // Check the CRC of the ADU
-      DEBUG_SERIAL.println (F("receive(): ADU CRC passed"));
+      MODBUS_DEBUG_SERIAL.println (F("receive(): ADU CRC passed"));
       return (int) adu.getLength(); // Return the length of the ADU
     }
     else {
-      DEBUG_SERIAL.println (F("receive(): ADU CRC failed"));
+      MODBUS_DEBUG_SERIAL.println (F("receive(): ADU CRC failed"));
     }
   }
   
@@ -674,24 +693,32 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Sends the specified ADU to the serial port. The function will check the CRC
+ * before sending it. Returns the ADU length if the operation was successful. Otherwise
+ * it will return -1.
+ * 
+ * @param adu The ADU to send.
+ * @return int - ADU length, or -1 if the operation fails.
+ */
 int CSE_ModbusRTU:: send (CSE_ModbusRTU_ADU& adu) {
   // Check if the ADU is valid
   if (adu.checkCRC()) {
-    DEBUG_SERIAL.print (F("send(): Sending ADU: 0x"));
+    MODBUS_DEBUG_SERIAL.print (F("send(): Sending ADU: 0x"));
 
+    // Print the ADU
     for (int i = 0; i < adu.getLength(); i++) {
-      DEBUG_SERIAL.print (" ");
+      MODBUS_DEBUG_SERIAL.print (" ");
       if (adu.getByte (i) < 0x10) {
-        DEBUG_SERIAL.print (F("0x0"));
+        MODBUS_DEBUG_SERIAL.print (F("0x0"));
       }
       else {
-        DEBUG_SERIAL.print (F("0x"));
+        MODBUS_DEBUG_SERIAL.print (F("0x"));
       }
-      DEBUG_SERIAL.print (adu.getByte (i), HEX);
+      MODBUS_DEBUG_SERIAL.print (adu.getByte (i), HEX);
     }
 
-    DEBUG_SERIAL.println();
+    MODBUS_DEBUG_SERIAL.println();
 
     // Send the ADU
     for (uint8_t i = 0; i < adu.getLength(); i++) {
@@ -705,7 +732,14 @@ int CSE_ModbusRTU:: send (CSE_ModbusRTU_ADU& adu) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Instantiates a new Modbus server object. You must send a parent Modbus RTU
+ * object and a name for the server. The name is used for debugging purposes.
+ * 
+ * @param rtu Parent Modbus RTU object.
+ * @param name Name of the server.
+ * @return CSE_ModbusRTU_Server:: 
+ */
 CSE_ModbusRTU_Server:: CSE_ModbusRTU_Server (CSE_ModbusRTU& rtu, String name) {
   this->rtu = &rtu;
   this->name = name;
@@ -714,6 +748,9 @@ CSE_ModbusRTU_Server:: CSE_ModbusRTU_Server (CSE_ModbusRTU& rtu, String name) {
   request.setType (CSE_ModbusRTU_ADU::aduType_t:: REQUEST);
   response.setType (CSE_ModbusRTU_ADU::aduType_t:: RESPONSE);
 
+
+  // Reserve memory for the data arrays. This is not necessary but it will prevent
+  // memory fragmentation.
   coils.reserve (MODBUS_RTU_COIL_COUNT_MAX);
   discreteInputs.reserve (MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX);
   holdingRegisters.reserve (MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX);
@@ -721,13 +758,22 @@ CSE_ModbusRTU_Server:: CSE_ModbusRTU_Server (CSE_ModbusRTU& rtu, String name) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Returns the name of the server.
+ * 
+ * @return String - Name of the server.
+ */
 String CSE_ModbusRTU_Server:: getName() {
   return name;
 }
 
 //======================================================================================//
-
+/**
+ * @brief Does nothing for now.
+ * 
+ * @return true 
+ * @return false 
+ */
 bool CSE_ModbusRTU_Server:: begin() {
   return true;
 }
@@ -740,7 +786,7 @@ bool CSE_ModbusRTU_Server:: begin() {
  * back to the client. The response is assembled into the response ADU. Finally, the
  * type of request received is returned.
  * 
- * @return int 
+ * @return int - Function code, or -1 if the operation fails.
  */
 int CSE_ModbusRTU_Server:: poll() {
   // First received a new ADU from the client
@@ -750,14 +796,14 @@ int CSE_ModbusRTU_Server:: poll() {
 
   // Now check if the address of the request matches the address of the server
   if (request.getDeviceAddress() != rtu->deviceAddress) {
-    DEBUG_SERIAL.println (F("poll(): Server addresses does not match."));
+    MODBUS_DEBUG_SERIAL.println (F("poll(): Server addresses does not match."));
     return -1;
   }
 
   // Check if the ADU received is an exception. A server is not meant to receive
   // a request that is an exception.
   if (request.getExceptionCode() != 0x00) {
-    DEBUG_SERIAL.println (F("poll(): Received an exception request to server."));
+    MODBUS_DEBUG_SERIAL.println (F("poll(): Received an exception request to server."));
     return -1;
   }
 
@@ -777,6 +823,11 @@ int CSE_ModbusRTU_Server:: poll() {
         send(); // Send the response
         return MODBUS_FC_READ_COILS + 0x80; // Return exception function code
       }
+
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to read coils 0x"));
+      MODBUS_DEBUG_SERIAL.print (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F(" to 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress() + request.getQuantity() - 1, HEX);
 
       // If the request is valid, we can proceed with reading the coils specified
       // and adding them to the response ADU.
@@ -836,6 +887,12 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_DISCRETE_INPUTS + 0x80; // Return exception function code
       }
 
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to read discrete inputs 0x"));
+      MODBUS_DEBUG_SERIAL.print (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F(" to 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress() + request.getQuantity() - 1, HEX);
+
+
       // If the request is valid, we can proceed with reading the discrete inputs specified
       // and adding them to the response ADU.
       response.resetLength(); // Reset the response length
@@ -893,6 +950,12 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_HOLDING_REGISTERS + 0x80; // Return exception function code
       }
 
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to read holding registers 0x"));
+      MODBUS_DEBUG_SERIAL.print (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F(" to 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress() + request.getQuantity() - 1, HEX);
+
+
       // If the request is valid, we can proceed with reading the holding registers specified
       // and adding them to the response ADU.
       response.resetLength(); // Reset the response length
@@ -936,6 +999,12 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_INPUT_REGISTERS + 0x80; // Return exception function code
       }
 
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to read input registers 0x"));
+      MODBUS_DEBUG_SERIAL.print (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F(" to 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress() + request.getQuantity() - 1, HEX);
+
+
       // If the request is valid, we can proceed with reading the input registers specified
       // and adding them to the response ADU.
       response.resetLength(); // Reset the response length
@@ -978,19 +1047,19 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_WRITE_SINGLE_COIL + 0x80; // Return exception function code
       }
 
-      DEBUG_SERIAL.print (F("poll(): Received request to write single coil 0x"));
-      DEBUG_SERIAL.println (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to write single coil 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress(), HEX);
 
       // If the coil is present in the server, we can proceed with writing the coil specified.
       // The coil state will be after the starting address in the request ADU.
       // The state can be either 0x0000 (OFF) or 0xFF00 (ON).
-      DEBUG_SERIAL.print (F("receive(): Writing value 0x"));
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Writing value 0x"));
       if (request.getWord (MODBUS_RTU_ADU_DATA_INDEX + 2) == 0x00) {
-        DEBUG_SERIAL.println (F("00"));
+        MODBUS_DEBUG_SERIAL.println (F("00"));
         writeCoil (request.getStartingAddress(), 0x00); // Write the coil to the server
       }
       else {
-        DEBUG_SERIAL.println (F("01"));
+        MODBUS_DEBUG_SERIAL.println (F("01"));
         writeCoil (request.getStartingAddress(), 0x01); // Write the coil to the server
       }
 
@@ -1016,6 +1085,9 @@ int CSE_ModbusRTU_Server:: poll() {
         send(); // Send the response
         return MODBUS_FC_WRITE_SINGLE_REGISTER + 0x80; // Return exception function code
       }
+
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to write single register 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress(), HEX);
 
       // If the holding register is present in the server, we can proceed with writing the holding register specified.
       // The holding register value will be after the starting address in the request ADU.
@@ -1044,6 +1116,11 @@ int CSE_ModbusRTU_Server:: poll() {
         send(); // Send the response
         return MODBUS_FC_WRITE_MULTIPLE_COILS + 0x80; // Return exception function code
       }
+
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to write multiple coils 0x"));
+      MODBUS_DEBUG_SERIAL.print (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F(" to 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress() + request.getQuantity() - 1, HEX);
 
       // The coil data will come packed as bits in the data field of the ADU.
       // So we need to extract each coil data and write them to the server.
@@ -1093,6 +1170,11 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_WRITE_MULTIPLE_REGISTERS + 0x80; // Return exception function code
       }
 
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received request to write multiple registers 0x"));
+      MODBUS_DEBUG_SERIAL.print (request.getStartingAddress(), HEX);
+      MODBUS_DEBUG_SERIAL.print (F(" to 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getStartingAddress() + request.getQuantity() - 1, HEX);
+
       // The holding register data will come packed as 16-bit words in the data field of the ADU.
       // So we need to extract each holding register data and write them to the server.
 
@@ -1125,9 +1207,9 @@ int CSE_ModbusRTU_Server:: poll() {
     //---------------------------------------------------------------------------------//
     
     default: {
-      DEBUG_SERIAL.print (F("poll(): Unsupported function code: 0x"));
-      DEBUG_SERIAL.println (request.getFunctionCode(), HEX);
-      DEBUG_SERIAL.println (F("poll(): Returning exception."));
+      MODBUS_DEBUG_SERIAL.print (F("poll(): Received unsupported function code: 0x"));
+      MODBUS_DEBUG_SERIAL.println (request.getFunctionCode(), HEX);
+      MODBUS_DEBUG_SERIAL.println (F("poll(): Returning exception."));
 
       // Any unsupported function code will be processed as an exception
       response.resetLength(); // Reset the response length
@@ -1144,28 +1226,51 @@ int CSE_ModbusRTU_Server:: poll() {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Receives a request from the client. Provided to access receive functionality
+ * through the server.
+ * 
+ * @return int - ADU length
+ */
 int CSE_ModbusRTU_Server:: receive() {
   // A server will use the request ADU to receive requests from the client.
   return rtu->receive (request);
 }
 
 //======================================================================================//
-
+/**
+ * @brief Sends a response to the client. Provided to access send functionality through
+ * the server.
+ * 
+ * @return int 
+ */
 int CSE_ModbusRTU_Server:: send() {
   // A server will use the response ADU to send responses to the client.
   return rtu->send (response);
 }
 
 //======================================================================================//
-
+/**
+ * @brief Configures the coil data array by adding new data to the coils vector.
+ * The maximum coil count is limited to MODBUS_RTU_COIL_COUNT_MAX which you can change
+ * if required. You can create a contiguous set of coils by specifying the starting
+ * address and the quantity of coils to be created. If you want coils of different
+ * and non-contiguous addresses, you can call this function multiple times. This library
+ * treats individual data as unique and independent; not as part of a contigous set.
+ * So two adjacent coils in the data array can have non-contiguous addresses.
+ * 
+ * @param startAddress The starting address of the coil (16-bit)
+ * @param quantity The number of coils to create (16-bit)
+ * @return true - Operation successful
+ * @return false - Operation failed
+ */
 bool CSE_ModbusRTU_Server:: configureCoils (uint16_t startAddress, uint16_t quantity) {
   // First check if the current coil count doesn't exceed the maximum coil count
   if (coils.size() == MODBUS_RTU_COIL_COUNT_MAX) {
     return false;
   }
 
-  // Now check if the input coil count won's exceed the maximum coil count
+  // Now check if the input coil count won't exceed the maximum coil count
   if ((coils.size() + quantity) > MODBUS_RTU_COIL_COUNT_MAX) {
     return false;
   }
@@ -1179,14 +1284,28 @@ bool CSE_ModbusRTU_Server:: configureCoils (uint16_t startAddress, uint16_t quan
 }
 
 //======================================================================================//
-
+/**
+ * @brief Configures the discrete input data array by adding new data to the discrete
+ * inputs vector. The maximum discrete input count is limited to MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX
+ * which you can change if required. You can create a contiguous set of discrete inputs
+ * by specifying the starting address and the quantity of discrete inputs to be created.
+ * If you want discrete inputs of different and non-contiguous addresses, you can call
+ * this function multiple times. This library treats individual data as unique and
+ * independent; not as part of a contigous set. So two adjacent discrete inputs in the
+ * data array can have non-contiguous addresses.
+ * 
+ * @param startAddress The starting address of the discrete input (16-bit)
+ * @param quantity The number of discrete inputs to create (16-bit)
+ * @return true - Operation successful
+ * @return false - Operation failed
+ */
 bool CSE_ModbusRTU_Server:: configureDiscreteInputs (uint16_t startAddress, uint16_t quantity) {
   // First check if the current discrete input count doesn't exceed the maximum discrete input count
   if (discreteInputs.size() == MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX) {
     return false;
   }
 
-  // Now check if the input discrete input count won's exceed the maximum discrete input count
+  // Now check if the input discrete input count won't exceed the maximum discrete input count
   if ((discreteInputs.size() + quantity) > MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX) {
     return false;
   }
@@ -1199,14 +1318,28 @@ bool CSE_ModbusRTU_Server:: configureDiscreteInputs (uint16_t startAddress, uint
 }
 
 //======================================================================================//
-
+/**
+ * @brief Configures the holding register data array by adding new data to the holding
+ * registers vector. The maximum holding register count is limited to MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX
+ * which you can change if required. You can create a contiguous set of holding registers
+ * by specifying the starting address and the quantity of holding registers to be created.
+ * If you want holding registers of different and non-contiguous addresses, you can call
+ * this function multiple times. This library treats individual data as unique and
+ * independent; not as part of a contigous set. So two adjacent holding registers in the
+ * data array can have non-contiguous addresses.
+ * 
+ * @param startAddress The starting address of the holding register (16-bit)
+ * @param quantity The number of holding registers to create (16-bit)
+ * @return true - Operation successful
+ * @return false - Operation failed
+ */
 bool CSE_ModbusRTU_Server:: configureInputRegisters (uint16_t startAddress, uint16_t quantity) {
   // First check if the current input register count doesn't exceed the maximum input register count
   if (inputRegisters.size() == MODBUS_RTU_INPUT_REGISTER_COUNT_MAX) {
     return false;
   }
 
-  // Now check if the input input register count won's exceed the maximum input register count
+  // Now check if the input input register count won't exceed the maximum input register count
   if ((inputRegisters.size() + quantity) > MODBUS_RTU_INPUT_REGISTER_COUNT_MAX) {
     return false;
   }
@@ -1220,7 +1353,21 @@ bool CSE_ModbusRTU_Server:: configureInputRegisters (uint16_t startAddress, uint
 }
 
 //======================================================================================//
-
+/**
+ * @brief Configures the holding register data array by adding new data to the holding
+ * registers vector. The maximum holding register count is limited to MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX
+ * which you can change if required. You can create a contiguous set of holding registers
+ * by specifying the starting address and the quantity of holding registers to be created.
+ * If you want holding registers of different and non-contiguous addresses, you can call
+ * this function multiple times. This library treats individual data as unique and
+ * independent; not as part of a contigous set. So two adjacent holding registers in the
+ * data array can have non-contiguous addresses.
+ * 
+ * @param startAddress The starting address of the holding register (16-bit)
+ * @param quantity The number of holding registers to create (16-bit)
+ * @return true - Operation successful
+ * @return false - Operation failed
+ */
 bool CSE_ModbusRTU_Server:: configureHoldingRegisters (uint16_t startAddress, uint16_t quantity) {
   // First check if the current holding register count doesn't exceed the maximum holding register count
   if (holdingRegisters.size() == MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX) {
@@ -1239,7 +1386,14 @@ bool CSE_ModbusRTU_Server:: configureHoldingRegisters (uint16_t startAddress, ui
 }
 
 //======================================================================================//
-
+/**
+ * @brief Reads a single coil from the coil data array. The address is checked for validity
+ * by comparing it with the coil addresses in the coil data array. If the address is valid,
+ * the coil value is returned. If the address is invalid, -1 is returned.
+ * 
+ * @param address - The 16-bit address of the coil.
+ * @return int - Coil value; -1 if address is invalid.
+ */
 int CSE_ModbusRTU_Server:: readCoil (uint16_t address) {
   // First check if the coil exists
   for (uint16_t i = 0; i < coils.size(); i++) {
@@ -1252,7 +1406,19 @@ int CSE_ModbusRTU_Server:: readCoil (uint16_t address) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a single coil register on the server. The address is checked for validity
+ * by comparing it with the coil addresses in the coil data array. If the address is valid,
+ * the coil value is updated and 1 is returned. If the address is invalid, -1 is returned.
+ * The coil value can be 0x00 or 0x01. Any other value is invalid.
+ * 
+ * This function does not send anything to the client. This function is only used to update
+ * the server-side data.
+ * 
+ * @param address The 16-bit address of the coil.
+ * @param value 0x00 for OFF, and 0x01 for ON.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeCoil (uint16_t address, uint8_t value) {
   if ((value != 0x00) && (value != 0x01)) {
     return -1;
@@ -1270,7 +1436,18 @@ int CSE_ModbusRTU_Server:: writeCoil (uint16_t address, uint8_t value) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a contiguous series of coil registers on the server. Individual addresses
+ * are checked for validity by comparing them with the coil addresses in the coil data array.
+ * If any of the addresses are invalid, the function stops writing the values and returns 
+ * -1. If all the addresses are valid, the coil values are updated and 1 is returned.
+ * The coil value can be 0x00 or 0x01. Any other value is invalid.
+ * 
+ * @param address The 16-bit starting address of the coils.
+ * @param value 0x00 for OFF, and 0x01 for ON.
+ * @param count The number of coils to write.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeCoil (uint16_t address, uint8_t value, uint16_t count) {
   if ((value != 0x00) && (value != 0x01)) {
     return -1;
@@ -1298,9 +1475,9 @@ int CSE_ModbusRTU_Server:: writeCoil (uint16_t address, uint8_t value, uint16_t 
  * @brief Checks if a single coil with address is present in the server. The coil
  * addresses don't have to be contiguous. But ideally it should be.
  * 
- * @param address 
- * @return true 
- * @return false 
+ * @param address The coil address to check.
+ * @return true - Coil is present in the data array.
+ * @return false - Coil is not found.
  */
 bool CSE_ModbusRTU_Server:: isCoilPresent (uint16_t address) {
   // Check if the coil exists
@@ -1322,17 +1499,12 @@ bool CSE_ModbusRTU_Server:: isCoilPresent (uint16_t address) {
  * need to compare each of the coils specified in the range with the coils present
  * in the server.
  * 
- * @param address 
- * @param count 
- * @return true 
- * @return false 
+ * @param address The 16-bit starting address of the coils.
+ * @param count The number of coils to check.
+ * @return true - All coils are present in the server.
+ * @return false - One or more coils are not present in the server.
  */
 bool CSE_ModbusRTU_Server:: isCoilPresent (uint16_t address, uint16_t count) {
-  // // Check if the coil addresses go out of bounds
-  // if ((address + count) > (coils [coils.size() - 1].address + 1)) {
-  //   return false;
-  // }
-
   // Check if each of the coils exist
   for (uint16_t i = 0; i < count; i++) {
     if (!isCoilPresent (address + i)) { // If any of the coils don't exist, return false
@@ -1344,7 +1516,13 @@ bool CSE_ModbusRTU_Server:: isCoilPresent (uint16_t address, uint16_t count) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Reads a single discrete input register on the server. The address is checked
+ * for validity.
+ * 
+ * @param address The 16-bit address of the discrete input register.
+ * @return int - 0x00 if OFF; 0x01 if ON; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: readDiscreteInput (uint16_t address) {
   // First check if the discrete input exists
   for (uint16_t i = 0; i < discreteInputs.size(); i++) {
@@ -1363,9 +1541,9 @@ int CSE_ModbusRTU_Server:: readDiscreteInput (uint16_t address) {
  * @brief Writes the specified discrete input. Even though discrete inputs are read-
  * only, a server can write its own discrete inputs to update their states.
  * 
- * @param address 
- * @param value 
- * @return int 
+ * @param address The 16-bit address of the discrete input register.
+ * @param value 0x00 for OFF, and 0x01 for ON.
+ * @return int - 1 if successful; -1 if failed.
  */
 int CSE_ModbusRTU_Server:: writeDiscreteInput (uint16_t address, uint8_t value) {
   if ((value != 0x00) && (value != 0x01)) {
@@ -1384,7 +1562,18 @@ int CSE_ModbusRTU_Server:: writeDiscreteInput (uint16_t address, uint8_t value) 
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a contiguous series of discrete input registers on the server. Individual
+ * addresses are checked for validity by comparing them with the discrete input addresses
+ * in the discrete input data array. If any of the addresses are invalid, the function
+ * stops writing the values and returns -1. If all the addresses are valid, the discrete
+ * input values are updated and 1 is returned.
+ * 
+ * @param address The 16-bit starting address of the discrete input registers.
+ * @param value 0x00 for OFF, and 0x01 for ON.
+ * @param count The number of discrete input registers to write.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeDiscreteInput (uint16_t address, uint8_t value, uint16_t count) {
   if ((value != 0x00) && (value != 0x01)) {
     return -1;
@@ -1408,7 +1597,13 @@ int CSE_ModbusRTU_Server:: writeDiscreteInput (uint16_t address, uint8_t value, 
 }
 
 //======================================================================================//
-
+/**
+ * @brief Checks if a single discrete input with address is present in the server.
+ * 
+ * @param address The 16-bit address of the discrete input register.
+ * @return true - Discrete input is present in the server.
+ * @return false - Discrete input is not found in the server.
+ */
 bool CSE_ModbusRTU_Server:: isDiscreteInputPresent (uint16_t address) {
   // Check if the discrete input exists
   for (uint16_t i = 0; i < discreteInputs.size(); i++) {
@@ -1421,7 +1616,15 @@ bool CSE_ModbusRTU_Server:: isDiscreteInputPresent (uint16_t address) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Checks if a range of discrete inputs is present. If any of the discrete inputs
+ * is not present in the server, the function returns false.
+ * 
+ * @param address The 16-bit starting address of the discrete input registers.
+ * @param count The number of discrete input registers to check.
+ * @return true - All discrete inputs are present in the server.
+ * @return false - One or more discrete inputs are not present in the server.
+ */
 bool CSE_ModbusRTU_Server:: isDiscreteInputPresent (uint16_t address, uint16_t count) {
   // Check if each of the discrete inputs exist
   for (uint16_t i = 0; i < count; i++) {
@@ -1434,7 +1637,13 @@ bool CSE_ModbusRTU_Server:: isDiscreteInputPresent (uint16_t address, uint16_t c
 }
 
 //======================================================================================//
-
+/**
+ * @brief Reads a single input register on the server. The address is checked for
+ * validity.
+ * 
+ * @param address The 16-bit address of the input register.
+ * @return int - The value of the input register; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: readInputRegister (uint16_t address) {
   // First check if the input register exists
   for (uint16_t i = 0; i < inputRegisters.size(); i++) {
@@ -1447,7 +1656,14 @@ int CSE_ModbusRTU_Server:: readInputRegister (uint16_t address) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a single input register on the server. The address is checked for
+ * validity.
+ * 
+ * @param address The 16-bit address of the input register.
+ * @param value The 16-bit value to write to the input register.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeInputRegister (uint16_t address, uint16_t value) {
   // First check if the input register exists
   for (uint16_t i = 0; i < inputRegisters.size(); i++) {
@@ -1461,7 +1677,18 @@ int CSE_ModbusRTU_Server:: writeInputRegister (uint16_t address, uint16_t value)
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a contiguous series of input registers on the server. Individual
+ * addresses are checked for validity by comparing them with the input register addresses
+ * in the input register data array. If any of the addresses are invalid, the function
+ * stops writing the values and returns -1. If all the addresses are valid, the input
+ * register values are updated and 1 is returned.
+ * 
+ * @param address The 16-bit starting address of the input registers.
+ * @param value The 16-bit value to write to the input registers.
+ * @param count The number of input registers to write.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeInputRegister (uint16_t address, uint16_t value, uint16_t count) {
   // Check if the input register addresses go out of bounds
   if ((address + count) > (inputRegisters [inputRegisters.size() - 1].address + 1)) {
@@ -1481,7 +1708,13 @@ int CSE_ModbusRTU_Server:: writeInputRegister (uint16_t address, uint16_t value,
 }
 
 //======================================================================================//
-
+/**
+ * @brief Checks if a single input register with address is present in the server.
+ * 
+ * @param address The 16-bit address of the input register to check.
+ * @return true - Input register is present in the server.
+ * @return false - Input register is not found in the server.
+ */
 bool CSE_ModbusRTU_Server:: isInputRegisterPresent (uint16_t address) {
   // Check if the input register exists
   for (uint16_t i = 0; i < inputRegisters.size(); i++) {
@@ -1494,7 +1727,15 @@ bool CSE_ModbusRTU_Server:: isInputRegisterPresent (uint16_t address) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Checks if a range of input registers is present. If any of the input registers
+ * is not present in the server, the function returns false.
+ * 
+ * @param address The 16-bit starting address of the input registers.
+ * @param count The number of input registers to check.
+ * @return true - All input registers are present in the server.
+ * @return false - One or more input registers are not present in the server.
+ */
 bool CSE_ModbusRTU_Server:: isInputRegisterPresent (uint16_t address, uint16_t count) {
   // Check if each of the input registers exist
   for (uint16_t i = 0; i < count; i++) {
@@ -1507,7 +1748,13 @@ bool CSE_ModbusRTU_Server:: isInputRegisterPresent (uint16_t address, uint16_t c
 }
 
 //======================================================================================//
-
+/**
+ * @brief Reads a single holding register on the server. The address is checked for
+ * validity.
+ * 
+ * @param address The 16-bit address of the holding register.
+ * @return int - The value of the holding register; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: readHoldingRegister (uint16_t address) {
   // First check if the holding register exists
   for (uint16_t i = 0; i < holdingRegisters.size(); i++) {
@@ -1520,7 +1767,14 @@ int CSE_ModbusRTU_Server:: readHoldingRegister (uint16_t address) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a single holding register on the server. The address is checked for
+ * validity.
+ * 
+ * @param address The 16-bit address of the holding register.
+ * @param value The 16-bit value to write to the holding register.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeHoldingRegister (uint16_t address, uint16_t value) {
   // First check if the holding register exists
   for (uint16_t i = 0; i < holdingRegisters.size(); i++) {
@@ -1534,7 +1788,18 @@ int CSE_ModbusRTU_Server:: writeHoldingRegister (uint16_t address, uint16_t valu
 }
 
 //======================================================================================//
-
+/**
+ * @brief Writes a contiguous series of holding registers on the server. Individual
+ * addresses are checked for validity by comparing them with the holding register
+ * addresses in the holding register data array. If any of the addresses are invalid,
+ * the function stops writing the values and returns -1. If all the addresses are valid,
+ * the holding register values are updated and 1 is returned.
+ * 
+ * @param address The 16-bit starting address of the holding registers.
+ * @param value The 16-bit value to write to the holding registers.
+ * @param count The number of holding registers to write.
+ * @return int - 1 if successful; -1 if failed.
+ */
 int CSE_ModbusRTU_Server:: writeHoldingRegister (uint16_t address, uint16_t value, uint16_t count) {
   // Check if the holding register addresses go out of bounds
   if ((address + count) > (holdingRegisters [holdingRegisters.size() - 1].address + 1)) {
@@ -1554,7 +1819,13 @@ int CSE_ModbusRTU_Server:: writeHoldingRegister (uint16_t address, uint16_t valu
 }
 
 //======================================================================================//
-
+/**
+ * @brief Checks if a single holding register with address is present in the server.
+ * 
+ * @param address The 16-bit address of the holding register to check.
+ * @return true - Holding register is present in the server.
+ * @return false - Holding register is not found in the server.
+ */
 bool CSE_ModbusRTU_Server:: isHoldingRegisterPresent (uint16_t address) {
   // Check if the holding register exists
   for (uint16_t i = 0; i < holdingRegisters.size(); i++) {
@@ -1567,7 +1838,15 @@ bool CSE_ModbusRTU_Server:: isHoldingRegisterPresent (uint16_t address) {
 }
 
 //======================================================================================//
-
+/**
+ * @brief Checks if a range of holding registers is present. If any of the holding registers
+ * is not present in the server, the function returns false.
+ * 
+ * @param address The 16-bit starting address of the holding registers.
+ * @param count The number of holding registers to check.
+ * @return true - All holding registers are present in the server.
+ * @return false - One or more holding registers are not present in the server.
+ */
 bool CSE_ModbusRTU_Server:: isHoldingRegisterPresent (uint16_t address, uint16_t count) {
   // Check if each of the holding registers exist
   for (uint16_t i = 0; i < count; i++) {
