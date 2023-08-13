@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
  * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.2
+ * @version 0.0.3
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -201,15 +201,23 @@ bool CSE_ModbusRTU_ADU:: checkCRC() {
   // If the ADU length is less than 3, that means that the device address, function code,
   // and data are not set yet. In this case, we can't calculate the CRC.
   if (aduLength < 3) {
+    MODBUS_DEBUG_SERIAL.println (F("checkCRC(): Error - ADU length is less than 3."));
     return false;
   }
 
-  uint16_t crc = calculateCRC();
+  // To check CRC, it must have been already set.
+  uint16_t crc = calculateCRC (true);
 
   if ((aduBuffer [aduLength - 2] == (uint8_t) (crc & 0xFF)) && (aduBuffer [aduLength - 1] == (uint8_t) (crc >> 8))) {
+    // MODBUS_DEBUG_SERIAL.println (F("checkCRC(): CRCs match."));
     return true;
   }
   else {
+    MODBUS_DEBUG_SERIAL.print (F("checkCRC(): Error - CRCs do not match. Found: 0x"));
+    MODBUS_DEBUG_SERIAL.print (aduBuffer [aduLength - 2], HEX);
+    MODBUS_DEBUG_SERIAL.print (aduBuffer [aduLength - 1], HEX);
+    MODBUS_DEBUG_SERIAL.print (F(", Calculated: 0x"));
+    MODBUS_DEBUG_SERIAL.println (crc, HEX);
     return false;
   }
 }
@@ -217,11 +225,15 @@ bool CSE_ModbusRTU_ADU:: checkCRC() {
 //======================================================================================//
 /**
  * @brief Calculates the CRC of the ADU contents and returns it. If the aduLength is
- * not sufficient to calculate the CRC then 0x00 is returned.
+ * not sufficient to calculate the CRC then 0x00 is returned. The CRC can be calculated
+ * for the entire ADU buffer, or exclude the last two bytes is the CRC is already set.
  * 
+ * @param isCRCSet - If true, the CRC is already set and should not be included in the
+ * CRC calculation. If false, the CRC is not set and use the entire ADU bufer for CRC
+ * calculation.
  * @return uint16_t - The CRC of the ADU contents.
  */
-uint16_t CSE_ModbusRTU_ADU:: calculateCRC() {
+uint16_t CSE_ModbusRTU_ADU:: calculateCRC (bool isCRCSet) {
   // If the ADU length is less than 3, that means that the device address, function code,
   // and data are not set yet. In this case, we can't calculate the CRC.
   if (aduLength < 3) {
@@ -230,7 +242,17 @@ uint16_t CSE_ModbusRTU_ADU:: calculateCRC() {
 
   uint16_t crc = 0xFFFF;
 
-  for (uint8_t i = 0; i < (aduLength - MODBUS_RTU_CRC_LENGTH); i++) {
+  uint8_t length = 0;
+
+  if (isCRCSet) {
+    // If the CRC is already set, then we don't want to include it in the CRC calculation.
+    length = aduLength - MODBUS_RTU_CRC_LENGTH;
+  } else {
+    // If CRC is not set, we can calculate the CRC over the entire ADU buffer.
+    length = aduLength;
+  }
+
+  for (uint8_t i = 0; i < length; i++) {
     crc ^= aduBuffer [i];
 
     for (uint8_t j = 0; j < 8; j++) {
@@ -422,14 +444,18 @@ uint16_t CSE_ModbusRTU_ADU:: setCRC() {
   // If the ADU length is less than 3, that means that the device address, function code,
   // and data are not set yet. In this case, we can't set the data.
   if (aduLength < 3) {
+    MODBUS_DEBUG_SERIAL.println (F("setCRC(): ADU length is less than 3. Can't set CRC."));
     return 0x0000;
   }
 
-  uint16_t crc = calculateCRC();
+  uint16_t crc = calculateCRC (false);  // Use the entire buffer data.
 
   // CRC is written with Lo byte first, unlike the data field.
   aduBuffer [aduLength++] = (uint8_t) (crc & 0xFF); // Low byte
   aduBuffer [aduLength++] = (uint8_t) (crc >> 8); // High byte
+
+  MODBUS_DEBUG_SERIAL.print (F("setCRC(): CRC is 0x"));
+  MODBUS_DEBUG_SERIAL.println (crc, HEX);
 
   return crc;
 }
@@ -583,6 +609,30 @@ int CSE_ModbusRTU_ADU:: getType() {
 
 //======================================================================================//
 /**
+ * @brief Prints the ADU as a hex string.
+ * 
+ */
+void CSE_ModbusRTU_ADU:: print() {
+  // Print the ADU as a hex string
+  MODBUS_DEBUG_SERIAL.print ("ADU: ");
+
+  for (uint8_t i = 0; i < aduLength; i++) {
+    if (aduBuffer [i] < 0x10) {
+      MODBUS_DEBUG_SERIAL.print ("0x0");
+    }
+    else {
+      MODBUS_DEBUG_SERIAL.print ("0x");
+    }
+    
+    MODBUS_DEBUG_SERIAL.print (aduBuffer [i], HEX);
+    MODBUS_DEBUG_SERIAL.print (" ");
+  }
+
+  MODBUS_DEBUG_SERIAL.println();
+}
+
+//======================================================================================//
+/**
  * @brief Instantiate a new CSE_ModbusRTU object. The device address is the host
  * address. Serial port can be hardware or software serial port if you are using the
  * CSE_ArduinoRS485 library.
@@ -648,13 +698,13 @@ bool CSE_ModbusRTU:: setClient (CSE_ModbusRTU_Client& client) {
  * @param adu The ADU object to save the incoming data.
  * @return int - The ADU length, or -1 if the operation fails.
  */
-int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu) {
+int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout) {
   adu.resetLength(); // Reset the ADU length
   // MODBUS_DEBUG_SERIAL.print (F("receive(): Checking Modbus port.."));
   
   uint32_t startTime = millis();
 
-  while ((millis() - startTime) < 100) {
+  while ((millis() - startTime) < timeout) {
     // Read all the bytes from the serial port
     while ((serialPort->available() > 0) && (adu.getLength() < MODBUS_RTU_ADU_LENGTH_MAX)) {
       adu.add ((uint8_t) serialPort->read()); // Read the first byte
@@ -704,7 +754,7 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu) {
 int CSE_ModbusRTU:: send (CSE_ModbusRTU_ADU& adu) {
   // Check if the ADU is valid
   if (adu.checkCRC()) {
-    MODBUS_DEBUG_SERIAL.print (F("send(): Sending ADU: 0x"));
+    MODBUS_DEBUG_SERIAL.print (F("send(): Sending ADU:"));
 
     // Print the ADU
     for (int i = 0; i < adu.getLength(); i++) {
@@ -721,12 +771,19 @@ int CSE_ModbusRTU:: send (CSE_ModbusRTU_ADU& adu) {
     MODBUS_DEBUG_SERIAL.println();
 
     // Send the ADU
+    serialPort->beginTransmission();
+    
     for (uint8_t i = 0; i < adu.getLength(); i++) {
       serialPort->write (adu.getByte (i));
     }
 
+    serialPort->endTransmission();
+
     return adu.getLength(); // Return the length of the ADU
   }
+
+  MODBUS_DEBUG_SERIAL.println (F("send(): CRC checking failed!"));
+  adu.print();
 
   return -1;
 }
@@ -1856,6 +1913,573 @@ bool CSE_ModbusRTU_Server:: isHoldingRegisterPresent (uint16_t address, uint16_t
   }
 
   return true;
+}
+
+//======================================================================================//
+/**
+ * @brief Instantiates a new CSE_ModbusRTU_Client object. You must a send a parent
+ * CSE_ModbusRTU object and a name for the client.
+ * 
+ * @param rtu Parent CSE_ModbusRTU object.
+ * @param name Name of the client.
+ * @return CSE_ModbusRTU_Client:: 
+ */
+CSE_ModbusRTU_Client:: CSE_ModbusRTU_Client (CSE_ModbusRTU& rtu, String name) {
+  this->rtu = &rtu;
+  this->name = name;
+}
+
+//======================================================================================//
+/**
+ * @brief Sets the address of the Modbus server you want to communicate with. You
+ * must call this function before calling any of the read or write functions.
+ * 
+ * @param remoteAddress The 8-bit address of the remote server.
+ * @return true Operation successful.
+ * @return false Operation failed.
+ */
+bool CSE_ModbusRTU_Client:: setServerAddress (uint8_t remoteAddress) {
+  rtu->remoteDeviceAddress = remoteAddress;
+  return true;
+}
+
+//======================================================================================//
+/**
+ * @brief Returns the name of the client.
+ * 
+ * @return String - Name of the client.
+ */
+String CSE_ModbusRTU_Client:: getName () {
+  return name;
+}
+
+//======================================================================================//
+/**
+ * @brief Initializes the client.
+ * 
+ * @return true - Initialization successful.
+ * @return false - Initialization failed.
+ */
+bool CSE_ModbusRTU_Client:: begin() {
+  return true;
+}
+
+//======================================================================================//
+/**
+ * @brief Listen to the serial port and receive the response from the server.
+ * 
+ * @return int - ADU length if successful; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: receive() {
+  return rtu->receive (response, receiveTimeout);
+}
+
+//======================================================================================//
+/**
+ * @brief Sends a request to the server.
+ * 
+ * @return int - ADU length if successful; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: send() {
+  return rtu->send (request);
+}
+
+//======================================================================================//
+/**
+ * @brief Read a single coil from the server. This function form the request message, sends
+ * it to the server and wait for a response. If the response ADU is checked for its type
+ * and then return the original function code if the operation is successful. If the
+ * response ADU is an exception, the exception code is returned. If the operation fails
+ * for other reasons, -1 returned.
+ * 
+ * @param address The 16-bit address of the coil register.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: readCoil (uint16_t address,  uint8_t count, uint8_t* coilValues) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_READ_COILS); // Function code to read coils
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) count);  // Set the 16-bit quantity of coils to read
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_READ_COILS) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    uint8_t byteCount = response.getByte (MODBUS_RTU_ADU_DATA_INDEX); // Get the byte count
+
+    // Extract the coil states from the ADU and save it to the coilValues array
+    uint16_t coilIndex = 0;
+
+    for (uint8_t i = 0; i < byteCount; i++) {
+      uint8_t coilByte = response.getByte (MODBUS_RTU_ADU_DATA_INDEX + 1 + i);  // Read each coil data byte from the ADU
+
+      for (uint8_t j = 0; j < 8; j++) {
+        // We only need to read the number of coils requested.
+        // More than that will cause an array out of bound error.
+        if (coilIndex >= count) {
+          break;
+        }
+
+        *(coilValues + coilIndex) = (coilByte >> j) & 0x01;  // Save each coil state to the coilValues array
+        coilIndex++;
+      }
+    }
+
+    // Finally return the function code
+    return MODBUS_FC_READ_COILS;
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+  
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Writes a single coil to the server.
+ * 
+ * @param address The address of the coil register.
+ * @param value The value to write to the coil register. Must be 0x0000 or 0xFF00.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: writeCoil (uint16_t address, uint16_t value) {
+  if (value > 0x00) {
+    value = 0xFF00;
+  }
+
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_WRITE_SINGLE_COIL); // Function code to write coils
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) value);  // Set the 16-bit value to write. Must be 0x0000 or 0xFF00.
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    MODBUS_DEBUG_SERIAL.println (F("writeCoil(): Sending request failed!"));
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    MODBUS_DEBUG_SERIAL.println (F("writeCoil(): No response received!"));
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    MODBUS_DEBUG_SERIAL.println (F("writeCoil(): Address mismatch!"));
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_WRITE_SINGLE_COIL) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+    MODBUS_DEBUG_SERIAL.println (F("writeCoil(): Writing coil successful."));
+    return MODBUS_FC_WRITE_SINGLE_COIL;
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    MODBUS_DEBUG_SERIAL.println (F("writeCoil(): Received exception response!"));
+    return response.getExceptionCode();
+  }
+
+  MODBUS_DEBUG_SERIAL.println (F("writeCoil(): Writing failed!"));
+  
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Writes multiple coils to the server. You must first create an uint8_t array of
+ * coil values. Each value in the array must be 0x00 or 0x01. The size of the array must
+ * be equal to the coil count you want to write.
+ * 
+ * @param address The starting address of the coil registers.
+ * @param count The number of coils to write.
+ * @param coilValues A uint8_t array of coil values to write. Each value must be 0x00 or 0x01.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: writeCoil (uint16_t address, uint16_t count, uint8_t* coilValues) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_WRITE_MULTIPLE_COILS); // Function code to write multiple coils
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) count);  // Set the 16-bit quantity of coils to write
+
+  // Now determine the number of bytes we will need to pack the coil values.
+  uint8_t byteCount = (uint8_t) (count / 8);
+
+  if (count % 8 > 0) {
+    byteCount++;  // If the count is not divisible by 8, then we need to add 1 more byte
+  }
+
+  request.add (byteCount);  // Set the number of bytes to follow
+
+  // Now we need to pack the coil values into the request ADU
+  for (uint8_t i = 0; i < byteCount; i++) {
+    uint8_t coilValue = 0x00; // Start with zero
+
+    for (uint8_t j = 0; j < 8; j++) {
+      uint8_t coilIndex = (i * 8) + j;  // Determine the byte position
+
+      if (coilIndex < count) {
+        coilValue |= (*(coilValues + coilIndex) << j);  // Set the bit
+      }
+      // Since we initialize coilValue with zero, we don't need to explicitly clear the bits.
+    }
+
+    request.add (coilValue);  // Add each byte to the request ADU
+  }
+
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_WRITE_MULTIPLE_COILS) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    // Check if the server responded with the same address and count as requested
+    if ((response.getWord (MODBUS_RTU_ADU_DATA_INDEX) == address) && (response.getWord (MODBUS_RTU_ADU_DATA_INDEX + 2) == count)) {
+      return MODBUS_FC_WRITE_MULTIPLE_COILS;
+    }
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+  
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Reads multiple discrete inputs from the server. You must first create an uint8_t
+ * array of size equal to the count you want to read. The function will fill the array with
+ * the discrete input values.
+ * 
+ * @param address The starting address of the discrete input registers.
+ * @param count The number of discrete inputs to read.
+ * @param inputValues A uint8_t array of size equal to the count you want to read.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: readDiscreteInput (uint16_t address,  uint8_t count, uint8_t* inputValues) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_READ_DISCRETE_INPUTS); // Function code to read discrete inputs
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) count);  // Set the 16-bit quantity of discrete inputs to read
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_READ_DISCRETE_INPUTS) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    uint8_t byteCount = response.getByte (MODBUS_RTU_ADU_DATA_INDEX); // Get the byte count
+
+    // Now we need to unpack the input values from the response ADU
+    uint8_t inputIndex = 0; // Start with zero
+
+    for (uint8_t i = 0; i < byteCount; i++) {
+      uint8_t inputByte = response.getByte (MODBUS_RTU_ADU_DATA_INDEX + 1 + i);  // Get each discrete input data byte from the response ADU
+
+      for (uint8_t j = 0; j < 8; j++) {
+        // We only need to read the number of discrete inputs requested.
+        // More than that will cause an array out of bound error.
+        if (inputIndex >= count) {
+          break;
+        }
+
+        *(inputValues + inputIndex) = (inputByte >> j) & 0x01;  // Save each discrete input state to the inputValues array
+        inputIndex++;
+      }
+    }
+
+    // Finally return the function code
+    return MODBUS_FC_READ_DISCRETE_INPUTS;
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Reads multiple holding registers from the server. You must first create an uint16_t
+ * array of size equal to the count you want to read. The function will fill the array with
+ * the holding register values.
+ * 
+ * @param address The starting address of the holding registers.
+ * @param count The number of holding registers to read.
+ * @param inputRegisters A uint16_t array of size equal to the count you want to read.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: readInputRegister (uint16_t address, uint8_t count, uint16_t* inputRegisters) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_READ_INPUT_REGISTERS); // Function code to read input registers
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) count);  // Set the 16-bit quantity of input registers to read
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_READ_INPUT_REGISTERS) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    // Now we need to unpack the input registers from the response ADU
+    for (uint8_t i = 0; i < count; i++) {
+      *(inputRegisters + i) = response.getWord ((MODBUS_RTU_ADU_DATA_INDEX + 1) + (i * 2));  // Get each input register data word from the response ADU
+    }
+
+    // Finally return the function code
+    return MODBUS_FC_READ_INPUT_REGISTERS;
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Reads multiple holding registers from the server. You must first create an uint16_t
+ * array of size equal to the count you want to read. The function will fill the array with
+ * the holding register values.
+ * 
+ * @param address The starting address of the holding registers.
+ * @param count The number of holding registers to read.
+ * @param holdingRegisters A uint16_t array of size equal to the count you want to read.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: readHoldingRegister (uint16_t address, uint8_t count, uint16_t* holdingRegisters) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_READ_HOLDING_REGISTERS); // Function code to read holding registers
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) count);  // Set the 16-bit quantity of holding registers to read
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+  
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_READ_HOLDING_REGISTERS) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    // Now we need to unpack the holding registers from the response ADU
+    for (uint8_t i = 0; i < count; i++) {
+      *(holdingRegisters + i) = response.getWord ((MODBUS_RTU_ADU_DATA_INDEX + 1) + (i * 2));  // Get each holding register data word from the response ADU
+    }
+
+    // Finally return the function code
+    return MODBUS_FC_READ_HOLDING_REGISTERS;
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Writes a single holding register to the server.
+ * 
+ * @param address The address of the holding register.
+ * @param value The value to write to the holding register.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: writeHoldingRegister (uint16_t address, uint16_t value) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_WRITE_SINGLE_REGISTER); // Function code to write a single holding register
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) value);  // Set the 16-bit value to write
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_WRITE_SINGLE_REGISTER) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    // Since the request and response ADUs are the same, we don't need to check anything else.
+
+    return MODBUS_FC_WRITE_SINGLE_REGISTER;
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Writes multiple holding registers to the server. You must first create an uint16_t
+ * array of size equal to the count you want to write. The function will write the holding
+ * register values from the array.
+ * 
+ * @param address The starting address of the holding registers.
+ * @param count The number of holding registers to write.
+ * @param registerValues A uint16_t array of size equal to the count you want to write.
+ * @return int - Function code if successful; Exception code if exception; -1 if failed.
+ */
+int CSE_ModbusRTU_Client:: writeHoldingRegister (uint16_t address, uint16_t count, uint16_t* registerValues) {
+  request.resetLength();  // Reset the ADU length to 0
+  request.setDeviceAddress (rtu->remoteDeviceAddress);  // The device address is the server address
+  request.setFunctionCode (MODBUS_FC_WRITE_MULTIPLE_REGISTERS); // Function code to write multiple holding registers
+  request.add ((uint16_t) address);  // Set the 16-bit starting address
+  request.add ((uint16_t) count);  // Set the 16-bit quantity of holding registers to write
+  request.add ((uint8_t) (count * 2));  // Set the byte count
+
+  // Write the requested number of register values to the request ADU
+  for (int i = 0; i < count; i++) {
+    request.add (*(registerValues + i));
+  }
+
+  request.setCRC(); // Set the CRC
+
+  // If the sending fails, return -1
+  if (send() < 0) {
+    return -1;
+  }
+
+  // If the sending doesn't fail, then try receiving the response.
+  // If receiving fails, stop and return -1
+  if (receive() < 0) {
+    return -1;
+  }
+
+  // Check if the response ADU has the same device address as the requested one.
+  if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
+    return -1;
+  }
+
+  // If sending and receiving doesn't fail, then check the function code in the response ADU.
+  // It should be the same as the requested one.
+  if (response.getFunctionCode() == MODBUS_FC_WRITE_MULTIPLE_REGISTERS) {
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
+
+    if (response.getWord (MODBUS_RTU_ADU_DATA_INDEX + 2) == count) {  // Check if the number of registers written is the same as the requested one
+      return MODBUS_FC_WRITE_MULTIPLE_REGISTERS;
+    }
+  }
+  else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
+    response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
+    return response.getExceptionCode();
+  }
+
+  return -1;
 }
 
 //======================================================================================//

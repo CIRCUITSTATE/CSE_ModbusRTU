@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.h
  * @brief Main header file for the CSE_ModbusRTU library.
  * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.2
+ * @version 0.0.3
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -109,7 +109,7 @@ class CSE_ModbusRTU_ADU {
     bool add (uint16_t* buffer, uint8_t length); // Add a buffer of words to the ADU buffer
 
     bool checkCRC(); // Check the CRC of the ADU buffer
-    uint16_t calculateCRC(); // Calculate the CRC of the ADU
+    uint16_t calculateCRC (bool isCRCSet = false); // Calculate the CRC of the ADU
 
     bool setType (int type); // Set the type of the ADU
     bool setDeviceAddress (uint8_t address); // Set the device address of the ADU
@@ -130,6 +130,8 @@ class CSE_ModbusRTU_ADU {
 
     uint8_t getByte (uint8_t index); // Get a byte from the ADU buffer
     uint16_t getWord (uint8_t index); // Get a word from the ADU buffer
+
+    void print(); // Print the ADU buffer to the serial port
 };
 
 //======================================================================================//
@@ -149,7 +151,7 @@ class CSE_ModbusRTU {
     String name; // The name of the Modbus RTU object
 
   public:
-    int receive (CSE_ModbusRTU_ADU& adu);  // Receive a custom Modbus RTU packet
+    int receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout = 100);  // Receive a custom Modbus RTU packet
     int send (CSE_ModbusRTU_ADU& adu); // Send a custom Modbus RTU packet
 
     /**
@@ -281,3 +283,43 @@ class CSE_ModbusRTU_Server {
 };
 
 //======================================================================================//
+
+class CSE_ModbusRTU_Client {
+  private:
+    String name; // The name of the client
+    CSE_ModbusRTU* rtu; // The parent RTU object
+  
+  public:
+
+    // There are two ADUs, one for request and one for response.
+    // request is used to send a request to the the server.
+    // and response is the response data from the server.
+    CSE_ModbusRTU_ADU request; // The request to server
+    CSE_ModbusRTU_ADU response; // The response from server
+
+    uint32_t receiveTimeout = 1000; // The timeout for receiving a response from the server
+
+    CSE_ModbusRTU_Client (CSE_ModbusRTU& rtu, String name);
+
+    bool begin();
+    int receive(); // Receive a response from the server
+    int send(); // Send a request to the server
+
+    bool setServerAddress (uint8_t remoteAddress); // Set the address of the server (0x00 to 0xFF)
+    String getName(); // Returns the name of the server
+
+    int readCoil (uint16_t address,  uint8_t count, uint8_t* coilValues); // Read a single coil from the server
+    int writeCoil (uint16_t address, uint16_t value); // Write a single coil to the server
+    int writeCoil (uint16_t address, uint16_t count, uint8_t* coilValues); // Write multiple coils to the server
+
+    int readDiscreteInput (uint16_t address, uint8_t count, uint8_t* inputValues); // Read a single discrete input from the server
+
+    int readInputRegister (uint16_t address, uint8_t count, uint16_t* inputRegisters); // Read a single input register from the server
+
+    int readHoldingRegister (uint16_t address, uint8_t count, uint16_t* holdingRegisters); // Read a single holding register from the server
+    int writeHoldingRegister (uint16_t address, uint16_t value); // Write a single holding register to the server
+    int writeHoldingRegister (uint16_t address, uint16_t count, uint16_t* registerValues); // Write multiple holding registers to the server
+};
+
+//======================================================================================//
+

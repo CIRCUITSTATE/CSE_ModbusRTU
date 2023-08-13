@@ -1,6 +1,6 @@
 {
     "name": "CSE_ModbusRTU",
-    "keywords": "modbus, rs485, rtu, communication, protocl",
+    "keywords": "modbus, rs485, rtu, communication, protocol",
     "description": "Arduino library for implementing Modbus RTU communication protocol on all compatible Arduino boards.",
     "repository":
     {
@@ -13,7 +13,7 @@
         "url": "https://github.com/vishnumaiea",
         "maintainer": true
     },
-    "version": "0.0.1",
+    "version": "0.0.3",
     "license": "MIT",
     "frameworks": "arduino",
     "platforms": "*"
