@@ -7,24 +7,59 @@
 #######################################
 
 CSE_GNSS KEYWORD1
-NMEA_0183_Data   KEYWORD1
+CSE_ModbusRTU_ADU   KEYWORD1
+CSE_ModbusRTU   KEYWORD1
+CSE_ModbusRTU_Server   KEYWORD1
+CSE_ModbusRTU_Client   KEYWORD1
+modbus_register_t   KEYWORD1
+modbus_bit_t   KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-parse                   KEYWORD2
+resetLength                   KEYWORD2
+getLength                   KEYWORD2
+clear                   KEYWORD2
+add                   KEYWORD2
+checkCRC                   KEYWORD2
+calculateCRC                   KEYWORD2
+setType                   KEYWORD2
+setDeviceAddress                   KEYWORD2
+setFunctionCode                   KEYWORD2
+setException                   KEYWORD2
+setExceptionCode                   KEYWORD2
+setData                   KEYWORD2
+setCRC                   KEYWORD2
+getDeviceAddress                   KEYWORD2
+getFunctionCode                   KEYWORD2
+getExceptionCode                   KEYWORD2
+getQuantity                   KEYWORD2
+getCRC                   KEYWORD2
+getType                   KEYWORD2
+getByte                   KEYWORD2
+getWord                   KEYWORD2
 print                   KEYWORD2
-set                   KEYWORD2
-check                   KEYWORD2
-find                   KEYWORD2
-count                   KEYWORD2
-getDataIndex                   KEYWORD2
+setServer                   KEYWORD2
+setClient                   KEYWORD2
+receive                   KEYWORD2
+send                   KEYWORD2
+getName                   KEYWORD2
 begin                   KEYWORD2
-read                   KEYWORD2
-addData                   KEYWORD2
-getDataCount                   KEYWORD2
-getDataRef                   KEYWORD2
+poll                   KEYWORD2
+readCoil                   KEYWORD2
+writeCoil                   KEYWORD2
+isCoilPresent                   KEYWORD2
+readDiscreteInput                   KEYWORD2
+writeDiscreteInput                   KEYWORD2
+isDiscreteInputPresent                   KEYWORD2
+readInputRegister                   KEYWORD2
+writeInputRegister                   KEYWORD2
+isInputRegisterPresent                   KEYWORD2
+readHoldingRegister                   KEYWORD2
+writeHoldingRegister                   KEYWORD2
+isHoldingRegisterPresent                   KEYWORD2
+setServerAddress                   KEYWORD2
 
 ######################################
 # Constants (LITERAL1)

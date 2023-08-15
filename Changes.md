@@ -1,5 +1,10 @@
 
 #
+### **+05:30 10:39:44 PM 15-08-2023, Tuesday**
+
+  * Updated library meta.
+  * New version **0.0.4**.
+#
 ### **+05:30 11:40:31 PM 13-08-2023, Sunday**
 
   * Added more debug messages.

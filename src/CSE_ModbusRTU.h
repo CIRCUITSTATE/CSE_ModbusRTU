@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.h
  * @brief Main header file for the CSE_ModbusRTU library.
  * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.3
+ * @version 0.0.4
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
