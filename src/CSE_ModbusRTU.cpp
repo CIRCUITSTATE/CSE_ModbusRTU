@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
  * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.4
+ * @version 0.0.5
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -1372,6 +1372,8 @@ bool CSE_ModbusRTU_Server:: configureDiscreteInputs (uint16_t startAddress, uint
     modbus_bit_t* newCoil = new modbus_bit_t (startAddress + i, 0x00);
     discreteInputs.push_back (*newCoil);
   }
+
+  return true;
 }
 
 //======================================================================================//
@@ -1440,6 +1442,8 @@ bool CSE_ModbusRTU_Server:: configureHoldingRegisters (uint16_t startAddress, ui
   for (uint16_t i = 0; i < quantity; i++) {
     holdingRegisters.push_back (modbus_register_t (startAddress + i, 0x0000));
   }
+
+  return true;
 }
 
 //======================================================================================//

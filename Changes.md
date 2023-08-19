@@ -1,5 +1,11 @@
 
 #
+### **+05:30 09:18:37 AM 19-08-2023, Saturday**
+
+  * Fixed non-void function without return value.
+  * New version `0.0.5`.
+
+#
 ### **+05:30 10:39:44 PM 15-08-2023, Tuesday**
 
   * Updated library meta.
