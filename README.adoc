@@ -1,0 +1,19 @@
+:repository-owner: CIRCUITSTATE
+:repository-name: CSE_ModbusRTU
+:repository-version: 0.0.6
+
+= {repository-name} Library for Arduino =
+
+This Arduino library allows you to implement the **Modbus RTU** protocol on any Arduino-supported microcontroller board. It supports both client and server modes. The library depends on the https://github.com/CIRCUITSTATE/CSE_ArduinoRS485[CSE_ArduinoRS485] library from CIRCUTISTATE. You can use both hardware and software serial ports for communication.
+
+This library is in pre-release stage and any feedback is welcome. Library API documentation can be found in **API.md**. 
+
+Two examples are included with this library:
+
+  * **ModbusRTU_Client_LED** - Acts as a Modbus RTU Client and sends periodic requests to a Modbus RTU Server to control an LED via Coil data.
+  * **ModbusRTU_Server_LED** - Acts as a Modbus RTU Server and responds to requests from a Modbus RTU Client to control an LED using Coil data.
+
+* https://www.circuitstate.com/tutorials/what-is-modbus-communication-protocol-and-how-to-implement-modbus-rtu-with-arduino/[Modbus RTU tutorial by CIRCUITSTATE]
+* https://www.circuitstate.com/tutorials/what-is-rs-485-how-to-use-max485-with-arduino-for-reliable-long-distance-serial-communication/[RS-485 tutorial by CIRCUITSTATE]
+* https://www.circuitstate.com/pinouts/max485-cd4069-rs-485-module-with-auto-data-direction-control-pinout-diagram-and-pin-reference/[MAX485+CD4069 Module Pinout by CIRCUITSTATE]
+

@@ -3,8 +3,8 @@
 /**
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
- * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.5
+ * @date +05:30 01:05:47 PM 21-10-2023, Saturday
+ * @version 0.0.6
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -104,7 +104,7 @@ bool CSE_ModbusRTU_ADU:: clear (uint8_t index, uint8_t length) {
 
 //======================================================================================//
 /**
- * @brief Add a byte to the ADU buffer. The new byte is written to the end of the
+ * @brief Add a single byte to the ADU buffer. The new byte is written at the end of the
  * buffer indicated by aduLength. The aduLength is incremented by 1.
  * 
  * @param byte The byte to add.
@@ -192,7 +192,9 @@ bool CSE_ModbusRTU_ADU:: add (uint16_t* buffer, uint8_t length) {
 
 //======================================================================================//
 /**
- * @brief Calculates the CRC of the ADU and compares it to the CRC in the ADU.
+ * @brief Calculates the CRC of the ADU and compares it to the CRC in the ADU. If the ADU
+ * length is less than 3, that means that the device address, function code, and data are
+ * not set yet. In this case, we can't calculate the CRC and the function returns `false`.
  * 
  * @return true - If the CRCs match.
  * @return false - If the CRCs do not match.
@@ -226,9 +228,9 @@ bool CSE_ModbusRTU_ADU:: checkCRC() {
 /**
  * @brief Calculates the CRC of the ADU contents and returns it. If the aduLength is
  * not sufficient to calculate the CRC then 0x00 is returned. The CRC can be calculated
- * for the entire ADU buffer, or exclude the last two bytes is the CRC is already set.
+ * for the entire ADU buffer, or exclude the last two bytes if the CRC is already set.
  * 
- * @param isCRCSet - If true, the CRC is already set and should not be included in the
+ * @param isCRCSet If true, the CRC is already set and should not be included in the
  * CRC calculation. If false, the CRC is not set and use the entire ADU bufer for CRC
  * calculation.
  * @return uint16_t - The CRC of the ADU contents.
@@ -275,7 +277,7 @@ uint16_t CSE_ModbusRTU_ADU:: calculateCRC (bool isCRCSet) {
  * doesn't check if the function code is valid for an exception. So you should only
  * use this function after you have set the ADU data correctly.
  * 
- * @param type A valid ADU type.
+ * @param type A valid ADU type. Check `aduType_t`.
  * @return true - Operation successful.
  * @return false - Operation failed due to invalid type.
  */
@@ -323,7 +325,7 @@ bool CSE_ModbusRTU_ADU:: setDeviceAddress (uint8_t address) {
  * be from 0x01 to 0x7F. The ADU length is incremented only if the current length is less
  * than 2. Ideally, you should set the function code after setting the device address.
  * 
- * @param functionCode Valid function code from 0x01 to 0x7F (1 - 127)
+ * @param functionCode Valid Modbus function code from 0x01 to 0x7F (1 - 127)
  * @return true - Operation successful.
  * @return false - Operation failed.
  */
@@ -579,7 +581,7 @@ uint8_t CSE_ModbusRTU_ADU:: getByte (uint8_t index) {
  * the aduLength. If the index is not valid (greater than aduLength), the function
  * returns 0x0000. So this does not guarantee that the function will always return a valid
  * word. Two consecutive bytes are combined to form the word. The index indicates the
- * position of the Hi byte. The oepration fails if the ADU length is less than 2.
+ * position of the Hi byte. The operation fails if the ADU length is less than 2.
  * 
  * @param index The starting index of the word to return.
  * @return uint16_t - The 16-bit word at the specified index.
@@ -838,7 +840,7 @@ bool CSE_ModbusRTU_Server:: begin() {
 //======================================================================================//
 /**
  * @brief This function is used to poll the server for new requests. When a request is
- * received, it is diassembled into the request ADU and checked for validity. This
+ * received, it is disassembled into the request ADU and checked for validity. This
  * function takes care of checking what type of request it is and then send a response
  * back to the client. The response is assembled into the response ADU. Finally, the
  * type of request received is returned.
@@ -1313,7 +1315,7 @@ int CSE_ModbusRTU_Server:: send() {
  * if required. You can create a contiguous set of coils by specifying the starting
  * address and the quantity of coils to be created. If you want coils of different
  * and non-contiguous addresses, you can call this function multiple times. This library
- * treats individual data as unique and independent; not as part of a contigous set.
+ * treats individual data as unique and independent; not as part of a contiguous set.
  * So two adjacent coils in the data array can have non-contiguous addresses.
  * 
  * @param startAddress The starting address of the coil (16-bit)
@@ -1348,7 +1350,7 @@ bool CSE_ModbusRTU_Server:: configureCoils (uint16_t startAddress, uint16_t quan
  * by specifying the starting address and the quantity of discrete inputs to be created.
  * If you want discrete inputs of different and non-contiguous addresses, you can call
  * this function multiple times. This library treats individual data as unique and
- * independent; not as part of a contigous set. So two adjacent discrete inputs in the
+ * independent; not as part of a contiguous set. So two adjacent discrete inputs in the
  * data array can have non-contiguous addresses.
  * 
  * @param startAddress The starting address of the discrete input (16-bit)
@@ -1378,17 +1380,17 @@ bool CSE_ModbusRTU_Server:: configureDiscreteInputs (uint16_t startAddress, uint
 
 //======================================================================================//
 /**
- * @brief Configures the holding register data array by adding new data to the holding
- * registers vector. The maximum holding register count is limited to MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX
- * which you can change if required. You can create a contiguous set of holding registers
- * by specifying the starting address and the quantity of holding registers to be created.
- * If you want holding registers of different and non-contiguous addresses, you can call
+ * @brief Configures the input register data array by adding new data to the input
+ * registers vector. The maximum input register count is limited to MODBUS_RTU_INPUT_REGISTER_COUNT_MAX
+ * which you can change if required. You can create a contiguous set of input registers
+ * by specifying the starting address and the quantity of input registers to be created.
+ * If you want input registers of different and non-contiguous addresses, you can call
  * this function multiple times. This library treats individual data as unique and
- * independent; not as part of a contigous set. So two adjacent holding registers in the
+ * independent; not as part of a contiguous set. So two adjacent input registers in the
  * data array can have non-contiguous addresses.
  * 
- * @param startAddress The starting address of the holding register (16-bit)
- * @param quantity The number of holding registers to create (16-bit)
+ * @param startAddress The starting address of the input register (16-bit)
+ * @param quantity The number of input registers to create (16-bit)
  * @return true - Operation successful
  * @return false - Operation failed
  */
@@ -1419,7 +1421,7 @@ bool CSE_ModbusRTU_Server:: configureInputRegisters (uint16_t startAddress, uint
  * by specifying the starting address and the quantity of holding registers to be created.
  * If you want holding registers of different and non-contiguous addresses, you can call
  * this function multiple times. This library treats individual data as unique and
- * independent; not as part of a contigous set. So two adjacent holding registers in the
+ * independent; not as part of a contiguous set. So two adjacent holding registers in the
  * data array can have non-contiguous addresses.
  * 
  * @param startAddress The starting address of the holding register (16-bit)
@@ -1699,7 +1701,7 @@ bool CSE_ModbusRTU_Server:: isDiscreteInputPresent (uint16_t address, uint16_t c
 
 //======================================================================================//
 /**
- * @brief Reads a single input register on the server. The address is checked for
+ * @brief Reads a single input register in the server. The address is checked for
  * validity.
  * 
  * @param address The 16-bit address of the input register.
@@ -1991,8 +1993,8 @@ int CSE_ModbusRTU_Client:: send() {
 //======================================================================================//
 /**
  * @brief Read a single coil from the server. This function form the request message, sends
- * it to the server and wait for a response. If the response ADU is checked for its type
- * and then return the original function code if the operation is successful. If the
+ * it to the server and wait for a response. The response ADU is checked for its type
+ * and the original function code is returned if the operation is successful. If the
  * response ADU is an exception, the exception code is returned. If the operation fails
  * for other reasons, -1 returned.
  * 

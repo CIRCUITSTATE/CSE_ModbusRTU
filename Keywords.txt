@@ -1,12 +1,11 @@
 #######################################
-# Syntax Coloring Map
+# Syntax Coloring Map for CSE_ModbusRTU
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-CSE_GNSS KEYWORD1
 CSE_ModbusRTU_ADU   KEYWORD1
 CSE_ModbusRTU   KEYWORD1
 CSE_ModbusRTU_Server   KEYWORD1
@@ -65,5 +64,4 @@ setServerAddress                   KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-PT_MODE_ONESHOT   LITERAL1
 

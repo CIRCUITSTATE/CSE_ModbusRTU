@@ -3,8 +3,8 @@
 /**
  * @file CSE_ModbusRTU.h
  * @brief Main header file for the CSE_ModbusRTU library.
- * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @version 0.0.5
+ * @date +05:30 01:05:34 PM 21-10-2023, Saturday
+ * @version 0.0.6
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -169,10 +169,15 @@ class CSE_ModbusRTU {
 
     serialPort_t serialPort; // The serial port used for Modbus RTU communication
 
+    // It is important to not get confused by the device address variables.
+    // A deviceAddress is the address of the host device itself. It can be a client or a server.
+    // A remoteDeviceAddress is the address of the remote device that the host device is communicating with.
+    // This can also be a client or a server.
+
     uint8_t deviceAddress; // The Modbus RTU device id (1-247). Can be client or server.
     uint8_t remoteDeviceAddress; // The remote Modbus RTU device id (1-247). Can be client or server.
 
-    // You can have only one server or client per RTU.
+    // You can have only one server and/or client per RTU.
     // If you want to have multiple servers or clients, you need to create multiple RTUs.
     // It is possible to have client and server at the same time.
     // But it's up to you to manage their roles and communication.
@@ -219,7 +224,7 @@ class modbus_register_t {
 
 //======================================================================================//
 /**
- * @brief Implments the Modbus RTU server node. You first need to create an instance of
+ * @brief Implements the Modbus RTU server node. You first need to create an instance of
  * CSE_ModbusRTU class and then pass it to the constructor of this class. Since the server
  * is what maintains the data, you can access and modify Modbus data with this class.
  * 
@@ -237,7 +242,7 @@ class CSE_ModbusRTU_Server {
     std::vector <modbus_register_t> inputRegisters;
 
     // There are two ADUs, one for request and one for response.
-    // request is used to receive data from the client.
+    // request ADUs are sent by the client.
     // and response is used to send data to the client.
     CSE_ModbusRTU_ADU request; // The request ADU
     CSE_ModbusRTU_ADU response; // The response ADU
@@ -247,7 +252,7 @@ class CSE_ModbusRTU_Server {
     String getName(); // Returns the name of the server
 
     bool begin(); // Does nothing for now.
-    int poll(); // Listen for incoming requests and process them
+    int poll(); // Listen for incoming requests from the client and process them
     int receive(); // Receive a request from the client
     int send(); // Send a response to the client
 
@@ -293,9 +298,9 @@ class CSE_ModbusRTU_Client {
 
     // There are two ADUs, one for request and one for response.
     // request is used to send a request to the the server.
-    // and response is the response data from the server.
-    CSE_ModbusRTU_ADU request; // The request to server
-    CSE_ModbusRTU_ADU response; // The response from server
+    // and response is the response ADU from the server.
+    CSE_ModbusRTU_ADU request; // The request sent to the server
+    CSE_ModbusRTU_ADU response; // The response from the server
 
     uint32_t receiveTimeout = 1000; // The timeout for receiving a response from the server
 
