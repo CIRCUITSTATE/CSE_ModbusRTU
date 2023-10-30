@@ -1,7 +1,15 @@
 
 # Changes
 
-## **+05:30 03:18:19 PM 21-10-2023, Saturday**\
+## **+05:30 03:04:48 PM 30-10-2023, Monday**
+
+  * Fixed `CSE_ModbusRTU::receive()` not asserting RE pin issue.
+  * Added new `enableReceive()` and `disableReceive()` functions to `CSE_ModbusRTU` class.
+  * Receiving is disabled with `disableReceive()` in `CSE_ModbusRTU_Client:: receive()` after a response is received or timeout occurs.
+  * None of the changes are breaking.
+  * New version **`0.0.7`**.
+
+## **+05:30 03:18:19 PM 21-10-2023, Saturday**
 
   * Updated documentation.
   * Updated library information.

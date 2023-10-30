@@ -41,6 +41,8 @@ getWord                   KEYWORD2
 print                   KEYWORD2
 setServer                   KEYWORD2
 setClient                   KEYWORD2
+enableReceive                   KEYWORD2
+disableReceive                   KEYWORD2
 receive                   KEYWORD2
 send                   KEYWORD2
 getName                   KEYWORD2
