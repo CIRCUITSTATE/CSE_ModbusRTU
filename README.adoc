@@ -6,7 +6,7 @@
 
 This Arduino library allows you to implement the **Modbus RTU** protocol on any Arduino-supported microcontroller board. It supports both client and server modes. The library depends on the https://github.com/CIRCUITSTATE/CSE_ArduinoRS485[CSE_ArduinoRS485] library from CIRCUTISTATE. You can use both hardware and software serial ports for communication.
 
-This library is in pre-release stage and any feedback is welcome. Library API documentation can be found in **API.md**. 
+This library is in pre-release stage and any feedback is welcome. Library API documentation can be found in link:/docs/API.md[API.md]. 
 
 Two examples are included with this library:
 
