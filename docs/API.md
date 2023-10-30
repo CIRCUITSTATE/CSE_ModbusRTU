@@ -1,10 +1,10 @@
-# CSE_ArduinoRS485 Library API Reference
+# CSE_ModbusRTU Library API Reference
 
-Version 0.0.7, +05:30 03:35:39 PM 30-10-2023, Monday
+Version 0.0.7, +05:30 07:17:47 PM 30-10-2023, Monday
 
 ## Index
 
-- [CSE\_ArduinoRS485 Library API Reference](#cse_arduinors485-library-api-reference)
+- [CSE\_ModbusRTU Library API Reference](#cse_modbusrtu-library-api-reference)
   - [Index](#index)
   - [Classes](#classes)
   - [Class `CSE_ModbusRTU_ADU`](#class-cse_modbusrtu_adu)
