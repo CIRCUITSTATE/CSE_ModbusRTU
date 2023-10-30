@@ -1,6 +1,6 @@
 :repository-owner: CIRCUITSTATE
 :repository-name: CSE_ModbusRTU
-:repository-version: 0.0.6
+:repository-version: 0.0.7
 
 = {repository-name} Library for Arduino =
 

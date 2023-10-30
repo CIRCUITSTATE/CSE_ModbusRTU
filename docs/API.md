@@ -1,6 +1,6 @@
 # CSE_ArduinoRS485 Library API Reference
 
-Version 0.0.6, +05:30 01:06:08 PM 21-10-2023, Saturday
+Version 0.0.7, +05:30 03:35:39 PM 30-10-2023, Monday
 
 ## Index
 
@@ -38,6 +38,8 @@ Version 0.0.6, +05:30 01:06:08 PM 21-10-2023, Saturday
     - [`getName()`](#getname)
     - [`setServer()`](#setserver)
     - [`setClient()`](#setclient)
+    - [`enableReceive()`](#enablereceive)
+    - [`disableReceive()`](#disablereceive)
     - [`receive()`](#receive)
     - [`send()`](#send)
   - [Class `CSE_ModbusRTU_Server`](#class-cse_modbusrtu_server)
@@ -76,7 +78,6 @@ Version 0.0.6, +05:30 01:06:08 PM 21-10-2023, Saturday
     - [`readInputRegister()`](#readinputregister-1)
     - [`readHoldingRegister()`](#readholdingregister-1)
     - [`writeHoldingRegister()`](#writeholdingregister-1)
-
 
 
 ## Classes
@@ -731,6 +732,51 @@ node.setClient (CSE_ModbusRTU_Client& client);
 * _`bool`_ :
   * `true` if the client was added successfully.
   * `false` otherwise.
+
+### `enableReceive()`
+
+Enables receiving data through the serial port by asserting the RE pin. This only works if an RE pin is specified (not `-1`) for the RS-485 port. Optionally, you can deassert the DE pin if is currently being asserted. Enabling receive mode when the DE pin is asserted has no effect, since DE has higher precedence than RE.
+
+If the RE pin is present, and is asserted, the function returns `0`. If the RE pin is not present or not asserted, the function returns `-1`. This does not indicate that the operation failed. RS-485 transceivers with a single pin for flow control (usually only DE), deasserting DE is enough to enable receive mode. For modules with auto data-direction control, both DE and RE need not be asserted/deasserted.
+
+#### Syntax
+  
+```cpp
+node.enableReceive (bool deassertDE);
+```
+
+##### Parameters
+
+* `deassertDE` : Optional.
+  * Default: `false`.
+  * `true` : Deassert the DE pin.
+  * `false` : Do not deassert the DE pin.
+
+##### Returns
+
+* _`int`_ :
+  * `0` if the RE pin is asserted.
+  * `-1` if the RE pin is not asserted as it is not available.
+
+### `disableReceive()`
+
+Disables receiving data through the serial port by de-asserting the RE pin. Only works if the RE pin is specified (not `-1`) for the RS-485 port. The DE pin is not affected. If the DE pin is also deasserted, the device will enter the high impedance mode.
+
+#### Syntax
+
+```cpp
+node.disableReceive();
+```
+
+##### Parameters
+
+None
+
+##### Returns
+
+* _`int`_ :
+  * `0` if the RE pin is deasserted.
+  * `-1` if the RE pin is not deasserted as it is not available.
 
 ### `receive()`
 
@@ -1478,7 +1524,7 @@ None
 
 ### `receive()`
 
-Receives a response from the server and save it to `response` ADU. This function uses the `receive()` function of the parent `CSE_ModbusRTU` object. The timeout is determined by `receiveTimeout`.
+Receives a response from the server and saves it to the `response` ADU. This function uses the `receive()` function of the parent `CSE_ModbusRTU` object. Receive mode will be enabled during reading the response. Receive mode is disabled after receiving the response, or if the timeout is reached. The timeout is determined by `receiveTimeout`.
 
 
 #### Syntax
