@@ -3,8 +3,8 @@
 /**
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
- * @date +05:30 01:05:47 PM 21-10-2023, Saturday
- * @version 0.0.6
+ * @date +05:30 03:13:02 PM 30-10-2023, Monday
+ * @version 0.0.7
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -692,7 +692,60 @@ bool CSE_ModbusRTU:: setClient (CSE_ModbusRTU_Client& client) {
 
 //======================================================================================//
 /**
- * @brief Reads the serial port and save an incoming ADU to the specified ADU object.
+ * @brief Enables receiving data through the serial port by asserting the RE pin.
+ * This only works if an RE pin is specified (not -1) for the RS-485 port.
+ * Optionally, you can deassert the DE pin if is currently being asserted.
+ * Enabling receive mode when the DE pin is asserted has no effect, since DE has higher
+ * precedence than RE.
+ * 
+ * If the RE pin is present, and is asserted, the function returns 0.
+ * If the RE pin is not present or not asserted, the fucntion returns -1.
+ * This does not indicate that the operation failed. RS-485 transceivers with a single pin
+ * for flow control (usually only DE), deasserting DE is enough to enable receive mode.
+ * For modules with auto data-direction control, both DE and RE need not be asserted/deasserted.
+ * 
+ * @param deassertDE If true, the DE pin is also deasserted before asserting the RE pin. Optional. Default is false.
+ * @return int - 0 if the operation was successful; -1 otherwise.
+ */
+int CSE_ModbusRTU:: enableReceive (bool toDeassertDE) {
+  if (toDeassertDE) {
+    serialPort->deassertDE();
+  }
+  
+  if (serialPort->assertRE()) { // Check if the pin is present and asserted
+    return 0; // Assertion success
+  }
+
+  return -1; 
+}
+
+//======================================================================================//
+/**
+ * @brief Disables receiving data through the serial port by de-asserting the RE pin.
+ * The DE pin is not affected. If the DE pin is also deasserted, the device will enter
+ * the high impedance mode.
+ * 
+ * Only works if the RE pin is specified (not -1) for the RS-485 port.
+ * 
+ * @return int - 0 if the operation was successful; -1 otherwise.
+ */
+int CSE_ModbusRTU:: disableReceive() {
+  if (serialPort->deassertRE()) { // Check if the pin is present and deasserted
+    return 0; // Deassertion success
+  }
+
+  // If the pin was not present or not deasserted, return -1.
+  return -1;
+}
+
+//======================================================================================//
+/**
+ * @brief Reads the serial port and saves an incoming ADU to the specified ADU object.
+ * This function will try to put the device in receive mode before reading the serial.
+ * Receive mode is not disabled when exiting the function. You must disable it manually
+ * if you want to. Since the sending operation has higher precedence than receiving,
+ * sending is not affected by the device being in receive mode.
+ * 
  * The aduLength is reset to 0 before reading the serial port. The function will check
  * the CRC of the received ADU and return the length of the ADU if the CRC is valid.
  * The address of the ADU is not checked. It has to be checked by the server or client.
@@ -704,6 +757,10 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout) {
   adu.resetLength(); // Reset the ADU length
   // MODBUS_DEBUG_SERIAL.print (F("receive(): Checking Modbus port.."));
   
+  // Put the serial port (RS485) in receive mode.
+  // This makes sure that the RE pin is asserted correctly before a receive operation.
+  enableReceive();
+
   uint32_t startTime = millis();
 
   while ((millis() - startTime) < timeout) {
@@ -1973,11 +2030,15 @@ bool CSE_ModbusRTU_Client:: begin() {
 //======================================================================================//
 /**
  * @brief Listen to the serial port and receive the response from the server.
+ * Receive mode will be enabled during reading the response.
+ * Receive mode is disabled after receiving the response, or if the timeout is reached.
  * 
  * @return int - ADU length if successful; -1 if failed.
  */
 int CSE_ModbusRTU_Client:: receive() {
-  return rtu->receive (response, receiveTimeout);
+  int result = rtu->receive (response, receiveTimeout);
+  rtu->disableReceive(); // Disable receiving after receiving the response
+  return result;
 }
 
 //======================================================================================//

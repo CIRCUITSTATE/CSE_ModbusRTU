@@ -3,8 +3,8 @@
 /**
  * @file CSE_ModbusRTU.h
  * @brief Main header file for the CSE_ModbusRTU library.
- * @date +05:30 01:05:34 PM 21-10-2023, Saturday
- * @version 0.0.6
+ * @date +05:30 03:10:23 PM 30-10-2023, Monday
+ * @version 0.0.7
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -151,6 +151,8 @@ class CSE_ModbusRTU {
     String name; // The name of the Modbus RTU object
 
   public:
+    int enableReceive (bool deassertDE = false); // Enable receiving Modbus RTU packets. Asserts RE. DE is optional.
+    int disableReceive(); // Disable receiving Modbus RTU packets. De-asserts RE. DE is not affected.
     int receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout = 100);  // Receive a custom Modbus RTU packet
     int send (CSE_ModbusRTU_ADU& adu); // Send a custom Modbus RTU packet
 
