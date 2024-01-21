@@ -1,6 +1,6 @@
 {
-    "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none,EraseFlash=none",
-    "board": "esp32:esp32:esp32doit-devkit-v1",
-    "sketch": "examples\\ModbusRTU_Server_LED\\ModbusRTU_Server_LED.ino",
-    "port": "COM14"
+    "board": "arduino:avr:uno",
+    "sketch": "examples\\ModbusRTU_AVR_Client_LED\\ModbusRTU_AVR_Client_LED.ino",
+    "port": "COM14",
+    "output": "build"
 }

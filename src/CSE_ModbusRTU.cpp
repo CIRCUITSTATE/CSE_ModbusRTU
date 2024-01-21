@@ -4,7 +4,7 @@
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
  * @date +05:30 03:13:02 PM 30-10-2023, Monday
- * @version 0.0.7
+ * @version 0.0.8
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -1090,6 +1090,8 @@ int CSE_ModbusRTU_Server:: poll() {
         j += 2;
       }
 
+      response.add (byteCount); // Set the byte count of the response
+      
       // Now we need to copy the register data into the response ADU
       response.add (registerData, byteCount); // Add the register data to the response ADU
       response.setCRC(); // Set the CRC of the response
@@ -1138,6 +1140,8 @@ int CSE_ModbusRTU_Server:: poll() {
         inputRegisterData [j + 1] = inputRegisters [i].value & 0xFF; // Get the low byte
         j += 2;
       }
+
+      response.add (byteCount); // Set the byte count of the response
 
       // Now we need to copy the input register data into the response ADU
       response.add (inputRegisterData, byteCount); // Add the input register data to the response ADU

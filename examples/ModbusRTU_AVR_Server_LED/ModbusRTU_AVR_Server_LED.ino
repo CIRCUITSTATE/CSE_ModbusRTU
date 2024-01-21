@@ -1,16 +1,16 @@
 
 //===================================================================================//
 /**
- * @file ModbusRTU_Server_LED.ino
+ * @file ModbusRTU_AVR_Server_LED.ino
  * @brief This example demonstrates the use of a Modbus RTU server to listen for Modbus
  * requests and turn an LED on and off. The request can come from any Modbus RTU client
- * including the ModbusRTU_Client_LED example. We define 4 coils but only use the 0x00
+ * including the ModbusRTU_AVR_Client_LED example. We define 4 coils but only use the 0x00
  * one to turn the LED on and off. We are using hardware serial port for the RS-485
  * interface.
  * 
  * This code was tested with the DOIT-ESP32-DevKit-V1 board.
  * 
- * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
+ * @date +05:30 07:13:04 PM 21-01-2024, Sunday
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -20,20 +20,24 @@
 
 #include <CSE_ArduinoRS485.h>
 #include <CSE_ModbusRTU.h>
+#include <SoftwareSerial.h>
 
 //===================================================================================//
 
-// You can define the serial port pins here.
-#define PIN_RS485_RX        16
-#define PIN_RS485_TX        17
+// You can define the software serial port pins here.
+#define PIN_RS485_RX        8
+#define PIN_RS485_TX        9
 
-#define PORT_RS485          Serial2 // The hardware serial port for the RS-485 interface
+#define PORT_RS485          Serial2 // The software serial port for the RS-485 interface
 
 //===================================================================================//
+
+// Create a new software serial port.
+SoftwareSerial Serial2 (PIN_RS485_RX, PIN_RS485_TX);
 
 const int ledPin = LED_BUILTIN;
 
-// Declare the RS485 interface here with a hardware serial port.
+// Declare the RS485 interface here with a software serial port.
 RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
 
 // Create a Modbus RTU node instance with the RS485 interface.
@@ -51,9 +55,7 @@ void setup() {
   Serial.println ("CSE_ModbusRTU - Modbus RTU Server LED");
 
   // Initialize the RS485 port manually.
-  // This particualr begin() call is specific to ESP32-Arduino.
-  // If you are using a different controller, change the begin() call accordingly.
-  PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  PORT_RS485.begin (9600);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
   // manually, then the parameter can be empty.

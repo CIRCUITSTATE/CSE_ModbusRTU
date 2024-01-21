@@ -1,6 +1,12 @@
 
 # Changes
 
+## **+05:30 07:17:59 PM 21-01-2024, Sunday**
+
+  * Added AVR examples.
+  * Fixed missing byte count in responses. [Issue #4](https://github.com/CIRCUITSTATE/CSE_ModbusRTU/issues/4).
+  * Added AVR standard vector library support. [Issue #2](https://github.com/CIRCUITSTATE/CSE_ModbusRTU/issues/2)
+
 ## **+05:30 03:04:48 PM 30-10-2023, Monday**
 
   * Fixed `CSE_ModbusRTU::receive()` not asserting RE pin issue.

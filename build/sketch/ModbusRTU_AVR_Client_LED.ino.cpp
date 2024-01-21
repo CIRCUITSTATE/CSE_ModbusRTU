@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#line 1 "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ModbusRTU_AVR_Client_LED\\ModbusRTU_AVR_Client_LED.ino"
 
 //===================================================================================//
 /**
@@ -20,16 +22,19 @@
 
 #include <CSE_ArduinoRS485.h>
 #include <CSE_ModbusRTU.h>
+#include <SoftwareSerial.h>
 
 //===================================================================================//
 
 // You can define the serial port pins here.
-#define PIN_RS485_RX        16
-#define PIN_RS485_TX        17
+#define PIN_RS485_RX        8
+#define PIN_RS485_TX        9
 
 #define PORT_RS485          Serial2 // The hardware serial port for the RS-485 interface
 
 //===================================================================================//
+
+SoftwareSerial Serial2 (PIN_RS485_RX, PIN_RS485_TX);
 
 // Declare the RS485 interface here with a hardware serial port.
 RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
@@ -42,6 +47,11 @@ CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_Mod
 
 //===================================================================================//
 
+#line 48 "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ModbusRTU_AVR_Client_LED\\ModbusRTU_AVR_Client_LED.ino"
+void setup();
+#line 70 "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ModbusRTU_AVR_Client_LED\\ModbusRTU_AVR_Client_LED.ino"
+void loop();
+#line 48 "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ModbusRTU_AVR_Client_LED\\ModbusRTU_AVR_Client_LED.ino"
 void setup() {
   // Initialize the default serial port for debug messages
   Serial.begin (115200);
@@ -51,7 +61,7 @@ void setup() {
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
   // If you are using a different controller, change the begin() call accordingly.
-  PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  PORT_RS485.begin (9600);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
   // manually, then the parameter can be empty.
@@ -84,3 +94,4 @@ void loop() {
 }
 
 //===================================================================================//
+

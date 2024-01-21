@@ -1,0 +1,10 @@
+{
+  "additionalFiles": "",
+  "builtInToolsFolders": "",
+  "compiler.optimization_flags": "",
+  "customBuildProperties": "build.warn_data_percentage=75",
+  "fqbn": "arduino:avr:uno",
+  "hardwareFolders": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages",
+  "otherLibrariesFolders": "D:\\Code\\Arduino\\libraries",
+  "sketchLocation": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ModbusRTU_AVR_Client_LED"
+}
