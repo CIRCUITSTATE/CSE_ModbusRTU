@@ -3,7 +3,7 @@
 /**
  * @file CSE_ModbusRTU.h
  * @brief Main header file for the CSE_ModbusRTU library.
- * @date +05:30 07:21:13 PM 21-01-2024, Sunday
+ * @date +05:30 10:15:02 AM 26-02-2024, Monday
  * @version 0.0.8
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
@@ -69,8 +69,20 @@
 #define   MODBUS_EX_GATEWAY_PATH_UNAVAILABLE            0x0A
 #define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0B
 
-// You can change the seril port for debug messages here
+// Enable/Disable debug messages here. 0 = Disabled, 1 = Enabled
+#define   DEBUG_ENABLED            1
+
+// You can change the serial port for debug messages here
 #define   MODBUS_DEBUG_SERIAL      Serial
+
+// Define macros for printing debug messages
+#if DEBUG_ENABLED
+  #define DEBUG_PRINT(x) MODBUS_DEBUG_SERIAL.print(x)
+  #define DEBUG_PRINTLN(x) MODBUS_DEBUG_SERIAL.println(x)
+#else
+  #define DEBUG_PRINT(x)
+  #define DEBUG_PRINTLN(x)
+#endif
 
 //======================================================================================//
 // Forward declarations

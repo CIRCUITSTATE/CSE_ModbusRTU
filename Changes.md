@@ -1,6 +1,10 @@
 
 # Changes
 
+## **+05:30 10:14:04 AM 26-02-2024, Monday**
+
+  * Added global switch macro for enabling/disabling debug messages.
+
 ## **+05:30 07:17:59 PM 21-01-2024, Sunday**
 
   * Added AVR examples.
