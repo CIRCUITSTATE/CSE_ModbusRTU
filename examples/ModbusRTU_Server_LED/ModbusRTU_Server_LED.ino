@@ -27,14 +27,14 @@
 #define PIN_RS485_RX        16
 #define PIN_RS485_TX        17
 
-#define PORT_RS485          Serial2 // The hardware serial port for the RS-485 interface
+#define PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
 
 //===================================================================================//
 
 const int ledPin = LED_BUILTIN;
 
 // Declare the RS485 interface here with a hardware serial port.
-RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
+RS485Class RS485 (PORT_RS485, 3, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
 
 // Create a Modbus RTU node instance with the RS485 interface.
 CSE_ModbusRTU modbusRTU (&RS485, 0x01, "modbusRTU-0x01"); // (RS-485 Port, Device Address, Device Name)
@@ -53,11 +53,16 @@ void setup() {
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
   // If you are using a different controller, change the begin() call accordingly.
-  PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  // PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+
+  PORT_RS485.setRX (1);
+  PORT_RS485.setTX (0);
+
+  pinMode (3, OUTPUT);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
   // manually, then the parameter can be empty.
-  RS485.begin();
+  RS485.begin (9600);
 
   // Initialize the Modbus RTU server
   modbusRTUServer.begin();
@@ -67,7 +72,8 @@ void setup() {
   digitalWrite (ledPin, LOW);
 
   // Configure four coils starting at address 0x00
-  modbusRTUServer.configureCoils (0x00, 4);
+  // modbusRTUServer.configureCoils (0x00, 4);
+  modbusRTUServer.configureHoldingRegisters (0x00, 9);
 }
 
 //===================================================================================//

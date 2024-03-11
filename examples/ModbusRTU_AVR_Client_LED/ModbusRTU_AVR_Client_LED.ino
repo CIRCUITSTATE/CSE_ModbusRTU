@@ -8,9 +8,10 @@
  * located at address 0x0000. You can use the ModbusRTU_AVR_Server_LED example to run
  * the server. We are using hardware serial port for the RS-485 interface.
  * 
- * This code was tested with the Arduino Uno board.
+ * This code was specifically written for AVR boards and was tested with the
+ * Arduino Uno board.
  * 
- * @date +05:30 07:12:58 PM 21-01-2024, Sunday
+ * @date +05:30 02:34:46 PM 28-01-2024, Sunday
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
  * @par MIT License
@@ -41,7 +42,7 @@ RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX
 // Create a Modbus RTU node instance with the RS485 interface.
 CSE_ModbusRTU modbusRTU (&RS485, 0x02, "modbusRTU-0x02"); // (RS-485 Port, Device Address, Device Name)
 
-// Create a Modbus RTU server instance with the Modbus RTU node.
+// Create a Modbus RTU client instance with the Modbus RTU node.
 CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_ModbusRTU, Client Name)
 
 //===================================================================================//

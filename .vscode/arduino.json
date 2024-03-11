@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:uno",
     "sketch": "examples\\ModbusRTU_AVR_Client_LED\\ModbusRTU_AVR_Client_LED.ino",
-    "port": "COM14",
+    "port": "COM5",
     "output": "build"
 }
