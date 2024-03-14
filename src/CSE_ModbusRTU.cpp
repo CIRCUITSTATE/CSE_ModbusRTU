@@ -1081,19 +1081,21 @@ int CSE_ModbusRTU_Server:: poll() {
       uint16_t registerCount = request.getQuantity(); // Get the number of registers needed
       uint8_t byteCount = registerCount * 2; // Get the number of bytes needed
 
-      uint8_t registerData [registerCount] = {0}; // Create an array to store the register data
+      // Create an array to store the register data.
+      // Since the register data is 16-bit, we need double the number of bytes.
+      uint8_t registerData [byteCount] = {0};
 
       // Read the register data from the holding registers and write them to the array
       for (int i = request.getStartingAddress(), j = 0; i < (request.getStartingAddress() + request.getQuantity()); i++) {
-        for(int k = 0; k < holdingRegisters.size(); k++){
-          if(holdingRegisters [k].address == i){
+        for (int k = 0; k < holdingRegisters.size(); k++) {
+          if (holdingRegisters [k].address == i) {
             registerData [j] = holdingRegisters [k].value >> 8; // Get the high byte
             registerData [j + 1] = holdingRegisters [k].value & 0xFF; // Get the low byte
             j += 2;
-            DEBUG_PRINT("Holding Register Address ");
-            DEBUG_PRINTLN(i);
-            DEBUG_PRINT("Holding Register Value ");
-            DEBUG_PRINTLN(holdingRegisters [k].value);
+            DEBUG_PRINT ("Address: 0x");
+            DEBUG_PRINT (i, HEX);
+            DEBUG_PRINT (", Value: 0x");
+            DEBUG_PRINTLN (holdingRegisters [k].value, HEX);
           }
         }
       }
@@ -1142,13 +1144,24 @@ int CSE_ModbusRTU_Server:: poll() {
       uint8_t registerCount = request.getQuantity(); // Get the number of registers needed (1-125)
       uint8_t byteCount = registerCount * 2; // Get the number of bytes needed
 
-      uint8_t inputRegisterData [registerCount] = {0}; // Create an array to store the input register data
+      // Create an array to store the register data.
+      // Since the register data is 16-bit, we need double the number of bytes.
+      uint8_t inputRegisterData [byteCount] = {0};
 
       // Read the register data from the input registers and write them to the array
       for (int i = request.getStartingAddress(), j = 0; i < (request.getStartingAddress() + request.getQuantity()); i++) {
-        inputRegisterData [j] = inputRegisters [i].value >> 8; // Get the high byte
-        inputRegisterData [j + 1] = inputRegisters [i].value & 0xFF; // Get the low byte
-        j += 2;
+        for (int k = 0; k < inputRegisters.size(); k++) {
+          if (holdingRegisters [k].address == i) {
+            inputRegisterData [j] = inputRegisters [k].value >> 8; // Get the high byte
+            inputRegisterData [j + 1] = inputRegisters [k].value & 0xFF; // Get the low byte
+            j += 2;
+
+            DEBUG_PRINT ("Address: 0x");
+            DEBUG_PRINT (i, HEX);
+            DEBUG_PRINT (", Value: 0x");
+            DEBUG_PRINTLN (inputRegisters [k].value, HEX);
+          }
+        }
       }
 
       response.add (byteCount); // Set the byte count of the response

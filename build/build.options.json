@@ -1,10 +1,10 @@
 {
   "additionalFiles": "",
   "builtInToolsFolders": "",
-  "compiler.optimization_flags": "",
+  "compiler.optimization_flags": "-Os",
   "customBuildProperties": "build.warn_data_percentage=75",
-  "fqbn": "arduino:avr:uno",
+  "fqbn": "esp32:esp32:dfrobot_firebeetle2_esp32e:PSRAM=disabled,PartitionScheme=default,CPUFreq=240,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,LoopCore=1,EventsCore=1,DebugLevel=none,EraseFlash=none",
   "hardwareFolders": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages",
   "otherLibrariesFolders": "D:\\Code\\Arduino\\libraries",
-  "sketchLocation": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ModbusRTU_AVR_Client_LED"
+  "sketchLocation": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\test\\ModbusRTU_Server_Test"
 }

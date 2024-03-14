@@ -1,6 +1,11 @@
 
 # Changes
 
+## **+05:30 11:37:40 PM 14-03-2024, Thursday**
+
+  * Fixed array out of bounds error when sending back register data.
+  * Added test sketches.
+
 ## **+05:30 10:14:04 AM 26-02-2024, Monday**
 
   * Added global switch macro for enabling/disabling debug messages.
