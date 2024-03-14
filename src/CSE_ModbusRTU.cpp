@@ -1085,10 +1085,20 @@ int CSE_ModbusRTU_Server:: poll() {
 
       // Read the register data from the holding registers and write them to the array
       for (int i = request.getStartingAddress(), j = 0; i < (request.getStartingAddress() + request.getQuantity()); i++) {
-        registerData [j] = holdingRegisters [i].value >> 8; // Get the high byte
-        registerData [j + 1] = holdingRegisters [i].value & 0xFF; // Get the low byte
-        j += 2;
+        for(int k = 0; k < holdingRegisters.size(); k++){
+          if(holdingRegisters [k].address == i){
+            registerData [j] = holdingRegisters [k].value >> 8; // Get the high byte
+            registerData [j + 1] = holdingRegisters [k].value & 0xFF; // Get the low byte
+            j += 2;
+            DEBUG_PRINT("Holding Register Address ");
+            DEBUG_PRINTLN(i);
+            DEBUG_PRINT("Holding Register Value ");
+            DEBUG_PRINTLN(holdingRegisters [k].value);
+          }
+        }
       }
+
+      // Now j should be equal to byteCount. Need to check!
 
       response.add (byteCount); // Set the byte count of the response
       

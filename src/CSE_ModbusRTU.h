@@ -77,11 +77,11 @@
 
 // Define macros for printing debug messages
 #if DEBUG_ENABLED
-  #define DEBUG_PRINT(x) MODBUS_DEBUG_SERIAL.print(x)
-  #define DEBUG_PRINTLN(x) MODBUS_DEBUG_SERIAL.println(x)
+  #define DEBUG_PRINT(...) MODBUS_DEBUG_SERIAL.print(__VA_ARGS__)
+  #define DEBUG_PRINTLN(...) MODBUS_DEBUG_SERIAL.println(__VA_ARGS__)
 #else
-  #define DEBUG_PRINT(x)
-  #define DEBUG_PRINTLN(x)
+  #define DEBUG_PRINT(...)
+  #define DEBUG_PRINTLN(...)
 #endif
 
 //======================================================================================//
