@@ -14,6 +14,9 @@
 
 #include "CSE_ModbusRTU.h"
 
+// Define the debugEnabled variable
+bool CSE_ModbusRTU_Debug:: debugEnabled = false;
+
 //======================================================================================//
 /**
  * @brief Create a new CSE_ModbusRTU_ADU object. The ADU buffer is cleated during
@@ -1099,8 +1102,6 @@ int CSE_ModbusRTU_Server:: poll() {
           }
         }
       }
-
-      // Now j should be equal to byteCount. Need to check!
 
       response.add (byteCount); // Set the byte count of the response
       

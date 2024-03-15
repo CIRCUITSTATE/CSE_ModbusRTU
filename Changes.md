@@ -1,6 +1,10 @@
 
 # Changes
 
+## **+05:30 12:25:48 AM 16-03-2024, Saturday**
+
+  * Implemented dynamic debug message printing functionality. The user can now enable/disable the debug messages on the fly.
+
 ## **+05:30 11:37:40 PM 14-03-2024, Thursday**
 
   * Fixed array out of bounds error when sending back register data.

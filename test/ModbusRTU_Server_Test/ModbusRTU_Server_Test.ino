@@ -39,6 +39,8 @@ CSE_ModbusRTU modbusRTU (&RS485, 0x01, "modbusRTU-0x01"); // (RS-485 Port, Devic
 // Create a Modbus RTU server instance with the Modbus RTU node.
 CSE_ModbusRTU_Server modbusRTUServer (modbusRTU, "modbusRTUServer"); // (CSE_ModbusRTU, Server Name)
 
+int counter = 0;
+
 //===================================================================================//
 
 void setup() {
@@ -78,6 +80,13 @@ void setup() {
 //===================================================================================//
 
 void loop() {
+  if ((counter % 2) != 0) {
+    CSE_ModbusRTU_Debug:: enableDebugMessages();
+  }
+  else {
+    CSE_ModbusRTU_Debug:: disableDebugMessages();
+  }
+
   // Poll for Modbus RTU requests
   int requestReceived = modbusRTUServer.poll();
 
@@ -97,6 +106,8 @@ void loop() {
     else {
       Serial.println ("Error reading coil");
     }
+
+    counter++;
   }
 }
 

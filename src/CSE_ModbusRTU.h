@@ -69,20 +69,38 @@
 #define   MODBUS_EX_GATEWAY_PATH_UNAVAILABLE            0x0A
 #define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0B
 
-// Enable/Disable debug messages here. 0 = Disabled, 1 = Enabled
-#define   DEBUG_ENABLED            1
+//======================================================================================//
 
 // You can change the serial port for debug messages here
 #define   MODBUS_DEBUG_SERIAL      Serial
 
-// Define macros for printing debug messages
-#if DEBUG_ENABLED
-  #define DEBUG_PRINT(...) MODBUS_DEBUG_SERIAL.print(__VA_ARGS__)
-  #define DEBUG_PRINTLN(...) MODBUS_DEBUG_SERIAL.println(__VA_ARGS__)
+// Enable or disable the debug functionality here.
+#define   ENABLE_DEBUG             1
+
+#ifdef ENABLE_DEBUG
+  #define DEBUG_PRINT_HELPER(condition, ...) \
+    do { \
+      if (condition) { \
+          MODBUS_DEBUG_SERIAL.print(__VA_ARGS__); \
+      } \
+    } while (0)
 #else
-  #define DEBUG_PRINT(...)
-  #define DEBUG_PRINTLN(...)
+  #define DEBUG_PRINT_HELPER(condition, ...) ((void)0)
 #endif
+
+#ifdef ENABLE_DEBUG
+  #define DEBUG_PRINTLN_HELPER(condition, ...) \
+    do { \
+      if (condition) { \
+          MODBUS_DEBUG_SERIAL.println(__VA_ARGS__); \
+      } \
+    } while (0)
+#else
+  #define DEBUG_PRINTLN_HELPER(condition, ...) ((void)0)
+#endif
+
+#define DEBUG_PRINT(...) DEBUG_PRINT_HELPER(CSE_ModbusRTU_Debug::debugEnabled, __VA_ARGS__)
+#define DEBUG_PRINTLN(...) DEBUG_PRINTLN_HELPER(CSE_ModbusRTU_Debug::debugEnabled, __VA_ARGS__)
 
 //======================================================================================//
 // Forward declarations
@@ -91,6 +109,33 @@ class CSE_ModbusRTU_ADU;
 class CSE_ModbusRTU;
 class CSE_ModbusRTU_Server;
 class CSE_ModbusRTU_Client;
+class CSE_ModbusRTU_Debug;
+
+//======================================================================================//
+
+// Define the DebugUtils class
+class CSE_ModbusRTU_Debug {
+public:
+  // Function to enable debug messages
+  static void enableDebugMessages() {
+    debugEnabled = true;
+  }
+
+  // Function to disable debug messages
+  static void disableDebugMessages() {
+    debugEnabled = false;
+  }
+
+  // Friend class declaration
+  friend class CSE_ModbusRTU_ADU; // Add more friend classes as needed
+  friend class CSE_ModbusRTU;
+  friend class CSE_ModbusRTU_Server;
+  friend class CSE_ModbusRTU_Client;
+
+private:
+  // Variable to track debug state
+  static bool debugEnabled;
+};
 
 //======================================================================================//
 /**
