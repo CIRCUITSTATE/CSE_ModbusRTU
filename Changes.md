@@ -1,6 +1,10 @@
 
 # Changes
 
+## **+05:30 12:44:25 AM 21-05-2024, Tuesday**
+
+  * Added include guard.
+
 ## **+05:30 12:25:48 AM 16-03-2024, Saturday**
 
   * Implemented dynamic debug message printing functionality. The user can now enable/disable the debug messages on the fly.

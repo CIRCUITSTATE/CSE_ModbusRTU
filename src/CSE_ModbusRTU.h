@@ -12,6 +12,9 @@
  */
 //======================================================================================//
 
+#ifndef CSE_MODBUSRTU_H
+#define CSE_MODBUSRTU_H
+
 #if defined(ARDUINO_ARCH_AVR)
   #include <ArduinoSTL.h>
 #else
@@ -388,6 +391,8 @@ class CSE_ModbusRTU_Client {
     int writeHoldingRegister (uint16_t address, uint16_t value); // Write a single holding register to the server
     int writeHoldingRegister (uint16_t address, uint16_t count, uint16_t* registerValues); // Write multiple holding registers to the server
 };
+
+#endif
 
 //======================================================================================//
 
