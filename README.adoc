@@ -33,7 +33,7 @@ Two examples are included with this library:
 
 == API Reference ==
 
-You can find the complete API reference for this library at link:docs/api.md[API.md].
+You can find the complete API reference for this library at link:docs/API.md[API.md].
 
 == References ==
 
