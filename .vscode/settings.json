@@ -44,5 +44,6 @@
     "streambuf": "cpp",
     "cinttypes": "cpp",
     "typeinfo": "cpp"
-  }
+  },
+  "asciidoc.antora.enableAntoraSupport": false
 }

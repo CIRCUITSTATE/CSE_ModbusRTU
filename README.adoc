@@ -2,18 +2,40 @@
 :repository-name: CSE_ModbusRTU
 :repository-version: 0.0.7
 
-= {repository-name} Library for Arduino =
+image::https://socialify.git.ci/CIRCUITSTATE/CSE_ModbusRTU/image?description=1&font=KoHo&forks=1&issues=1&logo=https%3A%2F%2Fwww.circuitstate.com%2Fwp-content%2Fuploads%2F2024%2F05%2FCIRCUITSTATE-R-Emblem-20052024-2.svg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto[CSE_ModbusRTU]
 
-This Arduino library allows you to implement the **Modbus RTU** protocol on any Arduino-supported microcontroller board. It supports both client and server modes. The library depends on the https://github.com/CIRCUITSTATE/CSE_ArduinoRS485[CSE_ArduinoRS485] library from CIRCUTISTATE. You can use both hardware and software serial ports for communication.
+= {repository-name} =
 
-This library is in pre-release stage and any feedback is welcome. Library API documentation can be found in link:/docs/API.md[API.md]. 
+This Arduino library allows you to implement the **Modbus RTU** protocol on any Arduino-supported microcontroller board. It supports both client and server modes. The library depends on the https://github.com/CIRCUITSTATE/CSE_ArduinoRS485[**CSE_ArduinoRS485**] library from https://www.circuitstate.com[CIRCUITSTATE Electronics]. You can use both hardware and software serial ports for communication.
 
+This library is in pre-release stage and any feedback is welcome.
+
+== Installation ==
+
+This library is available from the official **Arduino Library Manager**. Open the Arduino IDE, search for **{repository-name}** and install the latest version of the library.
+
+Additionally, you can download the latest release package from the GitHub repository and install it manually. To do so, open the Arduino IDE, go to **Sketch > Include Library > Add .ZIP Library...** and select the downloaded file.
+
+Another method is to clone the GitHub repository directly into your **libraries** folder. The development branch will have the latest features, bug fixes and other changes. To do so, navigate to your **libraries** folder (usually located at **Documents/Arduino/libraries** on Windows and **~/Documents/Arduino/libraries** on macOS) and execute the following command:
+
+[source,bash]
+----
+git clone https://github.com/CIRCUITSTATE/CSE_ModbusRTU.git
+----
+
+The library can also be installed via **PlatformIO**. All officially listed Arduino listed libraries are automatically fetched by PlatformIO. Use the `lib_deps` search option to install the library.
+
+== Examples ==
 Two examples are included with this library:
 
   * **ModbusRTU_Client_LED** - Acts as a Modbus RTU Client and sends periodic requests to a Modbus RTU Server to control an LED via Coil data.
   * **ModbusRTU_Server_LED** - Acts as a Modbus RTU Server and responds to requests from a Modbus RTU Client to control an LED using Coil data.
 
-== Reference ==
+== API Reference ==
+
+You can find the complete API reference for this library at link:docs/api.md[API.md].
+
+== References ==
 
 * https://www.circuitstate.com/tutorials/what-is-modbus-communication-protocol-and-how-to-implement-modbus-rtu-with-arduino/[Modbus RTU tutorial by CIRCUITSTATE]
 * https://www.circuitstate.com/tutorials/what-is-rs-485-how-to-use-max485-with-arduino-for-reliable-long-distance-serial-communication/[RS-485 tutorial by CIRCUITSTATE]
