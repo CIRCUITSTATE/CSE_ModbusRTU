@@ -1,7 +1,7 @@
 {
-    "board": "rp2040:rp2040:rpipico",
-    "sketch": "test\\ModbusRTU_Server_Test\\ModbusRTU_Server_Test.ino",
-    "port": "COM18",
+    "board": "esp8266:esp8266:generic",
+    "sketch": "examples\\ESP8266\\ModbusRTU_Server_LED\\ModbusRTU_Server_LED.ino",
+    "port": "COM3",
     "output": "build",
-    "configuration": "flash=2097152_0,freq=133,opt=Small,rtti=Disabled,stackprotect=Disabled,exceptions=Disabled,dbgport=Disabled,dbglvl=None,usbstack=picosdk,ipbtstack=ipv4only,uploadmethod=default"
+    "configuration": "xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,ResetMethod=nodemcu,CrystalFreq=26,FlashFreq=40,FlashMode=dout,eesz=1M64,led=2,sdk=nonosdk_190703,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200"
 }

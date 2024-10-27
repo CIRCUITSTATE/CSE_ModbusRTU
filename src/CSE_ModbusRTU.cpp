@@ -1520,7 +1520,7 @@ bool CSE_ModbusRTU_Server:: configureHoldingRegisters (uint16_t startAddress, ui
     return false;
   }
 
-  // Now check if the input holding register count won's exceed the maximum holding register count
+  // Now check if the input holding register count won't exceed the maximum holding register count
   if ((holdingRegisters.size() + quantity) > MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX) {
     return false;
   }

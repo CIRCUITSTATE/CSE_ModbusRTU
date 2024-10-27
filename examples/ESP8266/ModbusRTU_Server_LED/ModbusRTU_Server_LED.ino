@@ -1,23 +1,25 @@
 
 //===================================================================================//
 /**
-  * @file ModbusRTU_Server_Test.ino
-  * @brief This example is used to test server side functionalities of the CSE_ModbusRTU
-  * library.
-  * 
-  * This code was tested with the DFRobot FireBeetle 2 board.
-  * 
-  * @date +05:30 08:42:06 AM 11-03-2024, Monday
-  * @author Vishnu Mohanan (@vishnumaiea)
-  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  * @par MIT License
-  * 
-  */
+ * @file ModbusRTU_Server_LED.ino
+ * @brief This example demonstrates the use of a Modbus RTU server to listen for Modbus
+ * requests and turn an LED on and off. The request can come from any Modbus RTU client
+ * including the ModbusRTU_Client_LED example. We define 4 coils but only use the 0x00
+ * one to turn the LED on and off. We are using hardware serial port for the RS-485
+ * interface.
+ * 
+ * This code was tested with the NodeMCU ESP8266 board.
+ * 
+ * @date +05:30 10:46:34 PM 27-10-2024, Sunday
+ * @author Vishnu Mohanan (@vishnumaiea)
+ * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+ * @par MIT License
+ * 
+ */
 //===================================================================================//
 
 #include <CSE_ArduinoRS485.h>
 #include <CSE_ModbusRTU.h>
-// #include <HardwareSerial.h>
 
 //===================================================================================//
 
@@ -25,7 +27,7 @@
 #define PIN_RS485_RX        14
 #define PIN_RS485_TX        12
 
-#define PORT_RS485          softSerial // The hardware serial port for the RS-485 interface
+#define PORT_RS485          softSerial // The software serial port for the RS-485 interface
 
 //===================================================================================//
 
@@ -36,7 +38,7 @@ const int ledPin = LED_BUILTIN;
 SoftwareSerial softSerial (PIN_RS485_RX, PIN_RS485_TX); // RX, TX
 
 // Declare the RS485 interface here with a hardware serial port.
-RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
+RS485Class RS485 (PORT_RS485, 3, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
 
 // Create a Modbus RTU node instance with the RS485 interface.
 CSE_ModbusRTU modbusRTU (&RS485, 0x01, "modbusRTU-0x01"); // (RS-485 Port, Device Address, Device Name)
@@ -44,30 +46,23 @@ CSE_ModbusRTU modbusRTU (&RS485, 0x01, "modbusRTU-0x01"); // (RS-485 Port, Devic
 // Create a Modbus RTU server instance with the Modbus RTU node.
 CSE_ModbusRTU_Server modbusRTUServer (modbusRTU, "modbusRTUServer"); // (CSE_ModbusRTU, Server Name)
 
-int counter = 0;
-
 //===================================================================================//
 
 void setup() {
   // Initialize the default serial port for debug messages
   Serial.begin (115200);
   delay (1000);
-  Serial.println ("CSE_ModbusRTU - Modbus RTU Server Test");
+  Serial.println ("CSE_ModbusRTU - Modbus RTU Server LED");
+
+  pinMode (3, OUTPUT);
 
   // Initialize the RS485 port manually.
-  // This particualr begin() call is specific to ESP32-Arduino.
-  // If you are using a different controller, change the begin() call accordingly.
-  // PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
-
-
-  // PORT_RS485.begin (9600);
-
-  // pinMode (3, OUTPUT);
+  // This particualr begin() call is specific to ESP8266-Arduino.
+  PORT_RS485.begin (9600, SWSERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
   // manually, then the parameter can be empty.
-  // RS485.begin();
-  RS485.begin (9600, SWSERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  RS485.begin();
 
   // Initialize the Modbus RTU server
   modbusRTUServer.begin();
@@ -77,25 +72,13 @@ void setup() {
   digitalWrite (ledPin, LOW);
 
   // Configure four coils starting at address 0x00
-  modbusRTUServer.configureCoils (0x00, 4);
+  // modbusRTUServer.configureCoils (0x00, 4);
   modbusRTUServer.configureHoldingRegisters (0x00, 9);
-  
-  modbusRTUServer.writeHoldingRegister (0x00, 0x1234);
-  modbusRTUServer.writeHoldingRegister (0x01, 0x4321);
-  modbusRTUServer.writeHoldingRegister (0x02, 0xFF00);
-  modbusRTUServer.writeHoldingRegister (0x03, 0x00FF);
 }
 
 //===================================================================================//
 
 void loop() {
-  if ((counter % 2) != 0) {
-    CSE_ModbusRTU_Debug:: enableDebugMessages();
-  }
-  else {
-    CSE_ModbusRTU_Debug:: disableDebugMessages();
-  }
-
   // Poll for Modbus RTU requests
   int requestReceived = modbusRTUServer.poll();
 
@@ -115,8 +98,6 @@ void loop() {
     else {
       Serial.println ("Error reading coil");
     }
-
-    counter++;
   }
 }
 

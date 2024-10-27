@@ -43,7 +43,8 @@
     "stdexcept": "cpp",
     "streambuf": "cpp",
     "cinttypes": "cpp",
-    "typeinfo": "cpp"
+    "typeinfo": "cpp",
+    "ranges": "cpp"
   },
   "asciidoc.antora.enableAntoraSupport": false
 }

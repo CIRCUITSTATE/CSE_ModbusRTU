@@ -1679,7 +1679,7 @@ client.readInputRegister (uint16_t address,  uint8_t count, uint16_t* inputRegis
 
 ### `readHoldingRegister()`
 
-Read one or more holding registers from the remote server. This function form the `request` message, sends it to the server and wait for a response. The response from the server is saved to the `response` ADU. The `response` ADU is checked for its type and the original function code is returned if the operation is successful. If the response ADU is an exception, the exception code is returned. If the operation fails for other reasons, `-1` returned.
+Read one or more holding registers from the remote server. This function forms the `request` message, sends it to the server and wait for a response. The response from the server is saved to the `response` ADU. The `response` ADU is checked for its type and the original function code is returned if the operation is successful. If the response ADU is an exception, the exception code is returned. If the operation fails for other reasons, `-1` returned.
 
 #### Syntax
 

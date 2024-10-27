@@ -118,28 +118,32 @@ class CSE_ModbusRTU_Debug;
 
 //======================================================================================//
 
-// Define the DebugUtils class
+/**
+ * @brief This class allows you to enable or disable debug messages from the user code
+ * space.
+ * 
+ */
 class CSE_ModbusRTU_Debug {
-public:
-  // Function to enable debug messages
-  static void enableDebugMessages() {
-    debugEnabled = true;
-  }
+  public:
+    // Function to enable debug messages
+    static void enableDebugMessages() {
+      debugEnabled = true;
+    }
 
-  // Function to disable debug messages
-  static void disableDebugMessages() {
-    debugEnabled = false;
-  }
+    // Function to disable debug messages
+    static void disableDebugMessages() {
+      debugEnabled = false;
+    }
 
-  // Friend class declaration
-  friend class CSE_ModbusRTU_ADU; // Add more friend classes as needed
-  friend class CSE_ModbusRTU;
-  friend class CSE_ModbusRTU_Server;
-  friend class CSE_ModbusRTU_Client;
+    // Friend class declaration
+    friend class CSE_ModbusRTU_ADU; // Add more friend classes as needed
+    friend class CSE_ModbusRTU;
+    friend class CSE_ModbusRTU_Server;
+    friend class CSE_ModbusRTU_Client;
 
-private:
-  // Variable to track debug state
-  static bool debugEnabled;
+  private:
+    // Variable to track debug state
+    static bool debugEnabled;
 };
 
 //======================================================================================//

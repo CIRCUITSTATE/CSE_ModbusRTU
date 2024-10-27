@@ -5,6 +5,13 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 10:39:16 PM 27-10-2024, Sunday**
+
+  - Added target specific example folders for ESP32, ESP8266 and RP2040.
+  - Updated ESP8266 examples.
+    - Updated `ModbusRTU_Server_LED` and `ModbusRTU_Client_LED` examples.
+
+#
 ### **+05:30 10:35:29 AM 27-10-2024, Sunday**
 
   - Bumped up the library version in Arduino library manifest files.
