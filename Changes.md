@@ -5,6 +5,12 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 10:35:29 AM 27-10-2024, Sunday**
+
+  - Bumped up the library version in Arduino library manifest files.
+  - Updated comments in the header file.
+
+#
 ### **+05:30 09:53:27 AM 27-10-2024, Sunday**
 
   - Updated Changes.md style.

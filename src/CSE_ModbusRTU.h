@@ -73,12 +73,14 @@
 #define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0B
 
 //======================================================================================//
-
-// You can change the serial port for debug messages here
-#define   MODBUS_DEBUG_SERIAL      Serial
+// This section allows you to configure the debug message printing capability of the library.
 
 // Enable or disable the debug functionality here.
+// 1 = Enabled, 0 = Disabled.
 #define   ENABLE_DEBUG             1
+
+// Change the serial port used for debug messages here.
+#define   MODBUS_DEBUG_SERIAL      Serial
 
 #ifdef ENABLE_DEBUG
   #define DEBUG_PRINT_HELPER(condition, ...) \

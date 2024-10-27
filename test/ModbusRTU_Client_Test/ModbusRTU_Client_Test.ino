@@ -62,20 +62,20 @@ void setup() {
 //===================================================================================//
 
 void loop() {
-  if (modbusRTUClient.writeCoil (0x00, 0xFF00) == -1) { // Turn the LED on
-    Serial.println ("Turning LED on failed.");
+  if (modbusRTUClient.writeCoil (0x00, 0xFF00) == -1) { // Turn on the LED
+    Serial.println ("Turning on the LED failed.");
   }
   else {
-    Serial.println ("Turning LED on success.");
+    Serial.println ("Turning on the LED successful.");
   }
 
   delay (1000);
 
-  if (modbusRTUClient.writeCoil (0x00, 0x0000) == -1) { // Turn the LED off
-    Serial.println ("Turning LED off failed.");
+  if (modbusRTUClient.writeCoil (0x00, 0x0000) == -1) { // Turn off the LED
+    Serial.println ("Turning off the LED failed.");
   }
   else {
-    Serial.println ("Turning LED off success.");
+    Serial.println ("Turning off the LED successful.");
   }
   delay (1000);
 }
