@@ -1,7 +1,7 @@
 {
-    "board": "esp32:esp32:dfrobot_firebeetle2_esp32e",
+    "board": "rp2040:rp2040:rpipico",
     "sketch": "test\\ModbusRTU_Server_Test\\ModbusRTU_Server_Test.ino",
     "port": "COM18",
     "output": "build",
-    "configuration": "PSRAM=disabled,PartitionScheme=default,CPUFreq=240,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,LoopCore=1,EventsCore=1,DebugLevel=none,EraseFlash=none"
+    "configuration": "flash=2097152_0,freq=133,opt=Small,rtti=Disabled,stackprotect=Disabled,exceptions=Disabled,dbgport=Disabled,dbglvl=None,usbstack=picosdk,ipbtstack=ipv4only,uploadmethod=default"
 }

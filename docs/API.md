@@ -1,6 +1,6 @@
 # CSE_ModbusRTU Library API Reference
 
-Version 0.0.7, +05:30 07:17:47 PM 30-10-2023, Monday
+Version 0.0.8, +05:30 09:55:19 AM 27-10-2024, Sunday
 
 ## Index
 

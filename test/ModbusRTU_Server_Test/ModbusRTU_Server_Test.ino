@@ -1,22 +1,23 @@
 
 //===================================================================================//
 /**
- * @file ModbusRTU_Server_Test.ino
- * @brief This example is used to test server side functionalities of the CSE_ModbusRTU
- * library.
- * 
- * This code was tested with the DFRobot FireBeetle 2 board.
- * 
- * @date +05:30 08:42:06 AM 11-03-2024, Monday
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
- */
+  * @file ModbusRTU_Server_Test.ino
+  * @brief This example is used to test server side functionalities of the CSE_ModbusRTU
+  * library.
+  * 
+  * This code was tested with the DFRobot FireBeetle 2 board.
+  * 
+  * @date +05:30 08:42:06 AM 11-03-2024, Monday
+  * @author Vishnu Mohanan (@vishnumaiea)
+  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  * @par MIT License
+  * 
+  */
 //===================================================================================//
 
 #include <CSE_ArduinoRS485.h>
 #include <CSE_ModbusRTU.h>
+// #include <HardwareSerial.h>
 
 //===================================================================================//
 
@@ -52,7 +53,9 @@ void setup() {
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
   // If you are using a different controller, change the begin() call accordingly.
-  PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  // PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+
+  PORT_RS485.begin (9600);
 
   // pinMode (3, OUTPUT);
 

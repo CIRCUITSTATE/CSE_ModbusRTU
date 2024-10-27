@@ -3,7 +3,7 @@
 /**
  * @file CSE_ModbusRTU.cpp
  * @brief Main source file for the CSE_ModbusRTU library.
- * @date +05:30 10:15:10 AM 26-02-2024, Monday
+ * @date +05:30 09:55:57 AM 27-10-2024, Sunday
  * @version 0.0.8
  * @author Vishnu Mohanan (@vishnumaiea)
  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU

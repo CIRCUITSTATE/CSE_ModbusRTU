@@ -1,6 +1,6 @@
 :repository-owner: CIRCUITSTATE
 :repository-name: CSE_ModbusRTU
-:repository-version: 0.0.7
+:repository-version: 0.0.8
 
 image::https://socialify.git.ci/CIRCUITSTATE/CSE_ModbusRTU/image?description=1&font=KoHo&forks=1&issues=1&logo=https%3A%2F%2Fwww.circuitstate.com%2Fwp-content%2Fuploads%2F2024%2F05%2FCIRCUITSTATE-R-Emblem-20052024-2.svg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto[CSE_ModbusRTU]
 

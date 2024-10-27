@@ -1,18 +1,18 @@
 
 //===================================================================================//
 /**
- * @file ModbusRTU_Client_LED.ino
- * @brief This example is used to test client side functionalities of the CSE_ModbusRTU
- * library.
- * 
- * This code was tested with the DFRobot FireBeetle 2 board.
- * 
- * @date +05:30 07:29:26 PM 30-10-2023, Monday
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
- */
+  * @file ModbusRTU_Client_LED.ino
+  * @brief This example is used to test client side functionalities of the CSE_ModbusRTU
+  * library.
+  * 
+  * This code was tested with the DFRobot FireBeetle 2 board.
+  * 
+  * @date +05:30 07:29:26 PM 30-10-2023, Monday
+  * @author Vishnu Mohanan (@vishnumaiea)
+  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  * @par MIT License
+  * 
+  */
 //===================================================================================//
 
 #include <CSE_ArduinoRS485.h>
