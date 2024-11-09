@@ -1059,6 +1059,9 @@ int CSE_ModbusRTU_Server:: poll() {
       // if all of the holding registers in the range are present in the server.
       if ((request.getQuantity() > 0x007D) || (!isHoldingRegisterPresent (request.getStartingAddress(), request.getQuantity()))) {
         // Then process an exception
+        DEBUG_PRINTLN (F("poll(): Invalid request to read holding registers."));
+        DEBUG_PRINTLN (F("poll(): ERROR - Exception: Illegal data value."));
+        DEBUG_PRINTLN (F("poll(): Sending exception response."));
         response.resetLength(); // Reset the response length
         response.setDeviceAddress (rtu->deviceAddress); // Set the address of the response
         response.setFunctionCode (MODBUS_FC_READ_HOLDING_REGISTERS); // Set the function code of the response

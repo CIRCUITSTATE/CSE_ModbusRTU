@@ -1,7 +1,7 @@
 
 //===================================================================================//
 /**
- * @file ModbusRTU_Client_LED.ino
+ * @file ESP32/ModbusRTU_Client_LED.ino
  * @brief This example demonstrates the use of a Modbus RTU client to control an LED
  * connected to a remote Modbus RTU server. The client generates periodic requests
  * to the server to turn on and off the LED. The request consists of writing a coil
@@ -27,7 +27,7 @@
 #define PIN_RS485_RX        16
 #define PIN_RS485_TX        17
 
-#define PORT_RS485          Serial2 // The hardware serial port for the RS-485 interface
+#define PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
 
 //===================================================================================//
 
@@ -43,7 +43,7 @@ CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_Mod
 //===================================================================================//
 
 void setup() {
-  // Initialize the default serial port for debug messages
+  // Initialize the default serial port for debug messages.
   Serial.begin (115200);
   delay (1000);
   Serial.println ("CSE_ModbusRTU - Modbus RTU Client LED");
@@ -59,26 +59,30 @@ void setup() {
 
   // Initialize the Modbus RTU client.
   modbusRTUClient.begin();
-  modbusRTUClient.setServerAddress (0x01); // Set the server address to 0x01
+  modbusRTUClient.setServerAddress (0x01); // Set the server address to 0x01.
+
+  // Enable/Disable the debug messages here.
+  CSE_ModbusRTU_Debug:: enableDebugMessages();
+  // CSE_ModbusRTU_Debug:: disableDebugMessages();
 }
 
 //===================================================================================//
 
 void loop() {
-  if (modbusRTUClient.writeCoil (0x00, 0xFF00) == -1) { // Turn the LED on
-    Serial.println ("Turning LED on failed.");
+  if (modbusRTUClient.writeCoil (0x00, 0xFF00) == -1) { // Turn on the LED
+    Serial.println ("Turning on the LED failed.");
   }
   else {
-    Serial.println ("Turning LED on success.");
+    Serial.println ("Turning on the LED successful.");
   }
 
   delay (1000);
 
-  if (modbusRTUClient.writeCoil (0x00, 0x0000) == -1) { // Turn the LED off
-    Serial.println ("Turning LED off failed.");
+  if (modbusRTUClient.writeCoil (0x00, 0x0000) == -1) { // Turn off the LED
+    Serial.println ("Turning off the LED failed.");
   }
   else {
-    Serial.println ("Turning LED off success.");
+    Serial.println ("Turning off the LED successful.");
   }
   delay (1000);
 }

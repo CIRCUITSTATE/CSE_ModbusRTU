@@ -5,6 +5,15 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 07:31:34 PM 09-11-2024, Saturday**
+
+  - Updated ESP32 Holding Register examples.
+    - Updated `Holding_Register_Client.ino`.
+    - Updated `Holding_Register_Server.ino`.
+    - Tested both examples.
+  - Updated debug messages in the `poll()` function.
+
+#
 ### **+05:30 10:39:16 PM 27-10-2024, Sunday**
 
   - Added target specific example folders for ESP32, ESP8266 and RP2040.
