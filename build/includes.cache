@@ -2,12 +2,12 @@
   {
     "Sourcefile": null,
     "Include": "",
-    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.0.5\\cores\\esp32"
+    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.0.7\\cores\\esp32"
   },
   {
     "Sourcefile": null,
     "Include": "",
-    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.0.5\\variants\\doitESP32devkitV1"
+    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.0.7\\variants\\doitESP32devkitV1"
   },
   {
     "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Client.ino.cpp",
