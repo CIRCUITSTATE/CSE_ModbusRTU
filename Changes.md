@@ -5,6 +5,11 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 08:58:05 PM 22-03-2025, Saturday**
+
+  - Added Holding Register examples for ESP8266.
+
+#
 #### **+05:30 08:44:51 PM 22-03-2025, Saturday**
 
   - Updated ESP8266 LED examples and documentation.
