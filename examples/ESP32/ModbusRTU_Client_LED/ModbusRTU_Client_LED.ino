@@ -1,20 +1,23 @@
 
 //===================================================================================//
-/**
- * @file ESP32/ModbusRTU_Client_LED.ino
- * @brief This example demonstrates the use of a Modbus RTU client to control an LED
- * connected to a remote Modbus RTU server. The client generates periodic requests
- * to the server to turn on and off the LED. The request consists of writing a coil
- * located at address 0x0000. You can use the ModbusRTU_Server_LED example to run
- * the server. We are using hardware serial port for the RS-485 interface.
- * 
- * This code was tested with the DOIT-ESP32-DevKit-V1 board.
- * 
- * @date +05:30 07:29:26 PM 30-10-2023, Monday
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
+/*
+  Filename: ModbusRTU_Client_LED.ino [ESP32]
+  Description: This example demonstrates the use of a Modbus RTU client to control an LED
+  connected to a remote Modbus RTU server. The client generates periodic requests
+  to the server to turn on and off the LED. The request consists of writing a coil
+  located at address `0x0000`. You can use the ModbusRTU_Server_LED example to run
+  the server. We are using hardware serial port for the RS-485 interface.
+
+  This code was tested with the DFRobot FireBeetle-ESP32E board. For ModbusRTU emulation,
+  you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
+  
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.8
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 20:22:22 PM 22-03-2025, Saturday
  */
 //===================================================================================//
 
@@ -37,7 +40,7 @@ RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX
 // Create a Modbus RTU node instance with the RS485 interface.
 CSE_ModbusRTU modbusRTU (&RS485, 0x02, "modbusRTU-0x02"); // (RS-485 Port, Device Address, Device Name)
 
-// Create a Modbus RTU server instance with the Modbus RTU node.
+// Create a Modbus RTU client instance with the Modbus RTU node.
 CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_ModbusRTU, Client Name)
 
 //===================================================================================//

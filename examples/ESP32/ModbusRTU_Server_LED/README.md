@@ -1,11 +1,11 @@
 
 # CSE_ModbusRTU Arduino Library
 
-## Example - ModbusRTU_Server_LED
+## Example - ModbusRTU_Server_LED [ESP32]
 
 Filename: **ModbusRTU_Server_LED.ino**
 
-This example demonstrates the use of a Modbus RTU server to listen for Modbus requests from a client and turn an LED on and off. The request can come from any Modbus RTU client including the `ModbusRTU_Client_LED.ino` example. We define 4 coils but only use the one at `0x00` to control the LED. A client can write to that coil to turn on or turn off the LED. We are using hardware serial port for the RS-485 interface. This example is written for and tested with **DOIT-ESP32-DevKit-V1** board with multiple hardware serial ports and **MAX485+CD4069** RS485 module with automatic data-direction control.
+This example demonstrates the use of a Modbus RTU server to listen for Modbus requests from a client and turn an LED on and off. The request can come from any Modbus RTU client including the [**ModbusRTU_Client_LED.ino**](/examples/ESP32/ModbusRTU_Client_LED/ModbusRTU_Client_LED.ino) example. We define 4 coils but only use the one at `0x00` to control the LED. A client can write to that coil to turn on or turn off the LED. We are using hardware serial port for the RS-485 interface. This example is written for and tested with **DOIT-ESP32-DevKit-V1** board with multiple hardware serial ports and **MAX485+CD4069** RS485 module with automatic data-direction control.
 
 This library depends on the `CSE_ArduinoRS485` library. We need to create an `RS485Classs` port for communicating with the transceivers. In this example, a port object `RS485` is created for this, using `Serial2` as the serial interface. You can change this to any compatible Arduino serial ports. If a hardware serial ports like `Serial2` is not available, you can create a `SoftwareSerial` port and pass it the same way. This can be done for boards like Arduino Uno, Nano and other AVR boards. We are using GPIOs `16` and `17` for the serial port and you can also change this if your board supports it (eg. ESP32).
 

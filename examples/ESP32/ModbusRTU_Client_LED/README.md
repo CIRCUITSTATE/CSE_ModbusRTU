@@ -1,11 +1,11 @@
 
 # CSE_ModbusRTU Arduino Library
 
-## Example - ModbusRTU_Client_LED
+## Example - ModbusRTU_Client_LED [ESP32]
 
 Filename: **ModbusRTU_Client_LED.ino**
 
-This example demonstrates the use of a Modbus RTU client to control an LED connected to a remote Modbus RTU server. The client generates periodic requests to the server to turn on and turn off the LED. The request consists of writing a coil located at address `0x0000` at the server. You can use the `ModbusRTU_Server_LED.ino` example to run the server. We are using hardware serial port for the RS-485 interface. This example is written for and tested with **DOIT-ESP32-DevKit-V1** board with multiple hardware serial ports and **MAX485+CD4069** RS485 module with automatic data-direction control.
+This example demonstrates the use of a Modbus RTU client to control an LED connected to a remote Modbus RTU server. The client generates periodic requests to the server to turn on and turn off the LED. The request consists of writing a coil located at address `0x0000` at the server. You can use the [**ModbusRTU_Server_LED.ino**](/examples/ESP32/ModbusRTU_Server_LED/ModbusRTU_Server_LED.ino) example to run the server. We are using hardware serial port for the RS-485 interface. This example is written for and tested with **DOIT-ESP32-DevKit-V1** board with multiple hardware serial ports and **MAX485+CD4069** RS485 module with automatic data-direction control.
 
 This library depends on the `CSE_ArduinoRS485` library. We need to create an `RS485Classs` port for communicating with the transceivers. In this example, a serial port object `RS485` is created for this, using `Serial2` as the serial interface. You can change this to any compatible Arduino serial ports. If a hardware serial ports like `Serial2` is not available, you can create a `SoftwareSerial` port and pass it the same way. This can be done for boards like Arduino Uno, Nano and other AVR boards. We are using GPIOs `16` and `17` for the serial port and you can also change this if your board supports it (eg. ESP32).
 

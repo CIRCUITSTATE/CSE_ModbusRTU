@@ -1,20 +1,23 @@
 
 //===================================================================================//
-/**
- * @file ESP32/ModbusRTU_Server_LED.ino
- * @brief This example demonstrates the use of a Modbus RTU server to listen for Modbus
- * requests and turn an LED on and off. The request can come from any Modbus RTU client
- * including the ModbusRTU_Client_LED example. We define 4 coils but only use the 0x00
- * one to turn the LED on and off. We are using hardware serial port for the RS-485
- * interface.
- * 
- * This code was tested with the DOIT-ESP32-DevKit-V1 board.
- * 
- * @date +05:30 04:45:28 PM 02-08-2023, Wednesday
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
+/*
+  Filename: ModbusRTU_Server_LED.ino [ESP32]
+  Description: This example demonstrates the use of a Modbus RTU server to listen for Modbus
+  requests and turn an LED on and off. The request can come from any Modbus RTU client
+  including the ModbusRTU_Client_LED example. We define 4 coils but only use the `0x00`
+  one to turn the LED on and off. We are using hardware serial port for the RS-485
+  interface.
+
+  This code was tested with the DFRobot FireBeetle-ESP32E board. For ModbusRTU emulation,
+  you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
+  
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.8
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 20:23:44 PM 22-03-2025, Saturday
  */
 //===================================================================================//
 
