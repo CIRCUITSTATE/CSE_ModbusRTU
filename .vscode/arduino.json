@@ -1,7 +1,7 @@
 {
-    "board": "esp32:esp32:esp32doit-devkit-v1",
-    "sketch": "examples\\ESP32\\Holding_Register_Client\\Holding_Register_Client.ino",
+    "board": "esp8266:esp8266:nodemcuv2",
+    "sketch": "examples\\ESP8266\\Holding_Register_Server\\Holding_Register_Server.ino",
     "port": "COM5",
     "output": "build",
-    "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none,EraseFlash=none"
+    "configuration": "xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,led=2,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200"
 }

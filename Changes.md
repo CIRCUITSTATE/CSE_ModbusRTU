@@ -5,6 +5,14 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 09:09:51 PM 22-03-2025, Saturday**
+
+  - Fixed issues with ESP8266 Holding Register examples.
+    - Now using `SWSERIAL_8N1` instead of `SERIAL_8N1`.
+    - Fixed missing `holdingRegisters` array in the client example.
+    - Fixed serial port issues in the server example.
+
+#
 ### **+05:30 08:58:05 PM 22-03-2025, Saturday**
 
   - Added Holding Register examples for ESP8266.

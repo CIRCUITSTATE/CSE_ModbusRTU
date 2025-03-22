@@ -15,7 +15,7 @@
   Version: 0.0.8
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 20:51:02 PM 22-03-2025, Saturday
+  Last Modified: +05:30 21:13:07 PM 22-03-2025, Saturday
  */
 //===================================================================================//
 
@@ -45,6 +45,9 @@ CSE_ModbusRTU modbusRTU (&RS485, 0x02, "modbusRTU-0x02"); // (RS-485 Port, Devic
 // Create a Modbus RTU client instance with the Modbus RTU node.
 CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_ModbusRTU, Client Name)
 
+// Create an array to hold the values read from the Server.
+uint16_t holdingRegisters [10] = {0};
+
 //===================================================================================//
 
 void setup() {
@@ -54,9 +57,9 @@ void setup() {
   Serial.println ("CSE_ModbusRTU - Holding Register Client");
 
   // Initialize the RS485 port manually.
-  // This particualr begin() call is specific to ESP32-Arduino.
+  // This particualr begin() call is specific to ESP8266-Arduino.
   // If you are using a different controller, change the begin() call accordingly.
-  PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  PORT_RS485.begin (9600, SWSERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
   // manually, then the parameter can be empty.

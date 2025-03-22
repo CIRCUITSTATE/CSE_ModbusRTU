@@ -1,9 +1,9 @@
 {
   "additionalFiles": "..\\..",
-  "compiler.optimization_flags": "-Os",
+  "compiler.optimization_flags": "",
   "customBuildProperties": "build.warn_data_percentage=75",
-  "fqbn": "esp32:esp32:esp32doit-devkit-v1:FlashFreq=80,UploadSpeed=921600,DebugLevel=none,EraseFlash=none",
+  "fqbn": "esp8266:esp8266:nodemcuv2:xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,led=2,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200",
   "hardwareFolders": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages",
   "otherLibrariesFolders": "D:\\Code\\Arduino\\libraries",
-  "sketchLocation": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ESP32\\Holding_Register_Client"
+  "sketchLocation": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\examples\\ESP8266\\Holding_Register_Server"
 }

@@ -1,12 +1,12 @@
 
 //===================================================================================//
 /*
-  Filename: Holding_Register_Server.ino [ESP32]
+  Filename: Holding_Register_Server.ino [ESP8266]
   Description: This example demonstrates how to store Holding Registers at a Server
   and respond to a Client's requests to read/write them. You can use the 
   `Holding_Register_Client.ino` sketch on the Client side to test the server.
 
-  This code was tested with the DFRobot FireBeetle-ESP32E board. For ModbusRTU emulation,
+  This code was tested with the NodeMCU-ESP12E ESP8266 board. For ModbusRTU emulation,
   you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
   
   Framework: Arduino, PlatformIO
@@ -15,7 +15,7 @@
   Version: 0.0.8
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 20:09:17 PM 22-03-2025, Saturday
+  Last Modified: +05:30 21:15:26 PM 22-03-2025, Saturday
  */
 //===================================================================================//
 
@@ -25,12 +25,16 @@
 //===================================================================================//
 
 // You can define the serial port pins here.
-#define   PIN_RS485_RX        16
-#define   PIN_RS485_TX        17
+#define PIN_RS485_RX        14
+#define PIN_RS485_TX        12
 
-#define   PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
+#define PORT_RS485          softSerial // The software serial port for the RS-485 interface
 
 //===================================================================================//
+
+// Use the software serial port for the RS485 interface and the hardware serial port for
+// the debugging output.
+SoftwareSerial softSerial (PIN_RS485_RX, PIN_RS485_TX); // RX, TX
 
 // Declare the RS485 interface here with a hardware serial port.
 RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX)
@@ -49,9 +53,9 @@ void setup() {
   Serial.println ("CSE_ModbusRTU - Holding Register Server");
 
   // Initialize the RS485 port manually.
-  // This particualr begin() call is specific to ESP32-Arduino.
+  // This particualr begin() call is specific to ESP8266-Arduino.
   // If you are using a different controller, change the begin() call accordingly.
-  PORT_RS485.begin (9600, SERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
+  PORT_RS485.begin (9600, SWSERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
   // manually, then the parameter can be empty.
@@ -79,7 +83,7 @@ void setup() {
 void loop() {
   // Poll for Modbus RTU requests.
   int requestReceived = modbusRTUServer.poll();
-  delay (10)
+  delay (10);
 }
 
 //===================================================================================//

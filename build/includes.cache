@@ -2,30 +2,40 @@
   {
     "Sourcefile": null,
     "Include": "",
-    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.0.7\\cores\\esp32"
+    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\cores\\esp8266"
   },
   {
     "Sourcefile": null,
     "Include": "",
-    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.0.7\\variants\\doitESP32devkitV1"
+    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\variants\\nodemcu"
   },
   {
-    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Client.ino.cpp",
+    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Server.ino.cpp",
     "Include": "CSE_ArduinoRS485.h",
     "Includepath": "D:\\Code\\Arduino\\libraries\\CSE_ArduinoRS485\\src"
   },
   {
-    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Client.ino.cpp",
+    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Server.ino.cpp",
+    "Include": "SoftwareSerial.h",
+    "Includepath": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\SoftwareSerial\\src"
+  },
+  {
+    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Server.ino.cpp",
     "Include": "CSE_ModbusRTU.h",
     "Includepath": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\src"
   },
   {
-    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Client.ino.cpp",
+    "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ModbusRTU\\build\\sketch\\Holding_Register_Server.ino.cpp",
     "Include": "",
     "Includepath": null
   },
   {
     "Sourcefile": "D:\\Code\\Arduino\\libraries\\CSE_ArduinoRS485\\src\\CSE_RS485.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\vishn\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\SoftwareSerial\\src\\SoftwareSerial.cpp",
     "Include": "",
     "Includepath": null
   },
