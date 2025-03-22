@@ -5,6 +5,11 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+#### **+05:30 08:44:51 PM 22-03-2025, Saturday**
+
+  - Updated ESP8266 LED examples and documentation.
+
+#
 ### **+05:30 08:25:10 PM 22-03-2025, Saturday**
 
   - Updated ESP32 LED examples and documentation.

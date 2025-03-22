@@ -1,20 +1,23 @@
 
 //===================================================================================//
-/**
- * @file ModbusRTU_Server_LED.ino
- * @brief This example demonstrates the use of a Modbus RTU server to listen for Modbus
- * requests and turn an LED on and off. The request can come from any Modbus RTU client
- * including the ModbusRTU_Client_LED example. We define 4 coils but only use the 0x00
- * one to turn the LED on and off. We are using hardware serial port for the RS-485
- * interface.
- * 
- * This code was tested with the NodeMCU ESP8266 board.
- * 
- * @date +05:30 10:46:34 PM 27-10-2024, Sunday
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
+/*
+  Filename: ModbusRTU_Server_LED.ino [ESP8266]
+  Description: This example demonstrates the use of a Modbus RTU server to listen for Modbus
+  requests and turn an LED on and off. The request can come from any Modbus RTU client
+  including the ModbusRTU_Client_LED example. We define 4 coils but only use the 0x00
+  one to turn the LED on and off. We are using hardware serial port for the RS-485
+  interface.
+
+  This code was tested with the NodeMCU-ESP12E ESP8266 board. For ModbusRTU emulation,
+  you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
+  
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.8
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 20:40:40 PM 22-03-2025, Saturday
  */
 //===================================================================================//
 
@@ -64,35 +67,34 @@ void setup() {
   // manually, then the parameter can be empty.
   RS485.begin();
 
-  // Initialize the Modbus RTU server
+  // Initialize the Modbus RTU server.
   modbusRTUServer.begin();
 
-  // Configure the LED
+  // Configure the LED pin.
   pinMode (ledPin, OUTPUT);
   digitalWrite (ledPin, LOW);
 
-  // Configure four coils starting at address 0x00
-  // modbusRTUServer.configureCoils (0x00, 4);
-  modbusRTUServer.configureHoldingRegisters (0x00, 9);
+  // Configure four coils starting at address 0x00.
+  modbusRTUServer.configureCoils (0x00, 4);
 }
 
 //===================================================================================//
 
 void loop() {
-  // Poll for Modbus RTU requests
+  // Poll for Modbus RTU requests.
   int requestReceived = modbusRTUServer.poll();
 
   if ((requestReceived != -1) && (requestReceived < 0x80)) {
     Serial.println ("Request received");
-    // Read the current value of the coil
+    // Read the current value of the coil.
     int coilValue = modbusRTUServer.readCoil (0x00);
   
     if (coilValue == 1) {
-      // Coil value set, turn LED on
+      // Coil value set, turn LED on.
       digitalWrite (ledPin, HIGH);
     }
     else if (coilValue == 0) {
-      // Coil value clear, turn LED off
+      // Coil value clear, turn LED off.
       digitalWrite (ledPin, LOW);
     }
     else {

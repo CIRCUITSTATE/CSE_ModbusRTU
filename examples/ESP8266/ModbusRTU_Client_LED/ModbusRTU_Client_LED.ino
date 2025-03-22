@@ -1,20 +1,23 @@
 
 //===================================================================================//
-/**
- * @file ModbusRTU_Client_LED.ino
- * @brief This example demonstrates the use of a Modbus RTU client to control an LED
- * connected to a remote Modbus RTU server. The client generates periodic requests
- * to the server to turn on and off the LED. The request consists of writing a coil
- * located at address 0x0000. You can use the ModbusRTU_Server_LED example to run
- * the server. We are using hardware serial port for the RS-485 interface.
- * 
- * This code was tested with the NodeMCU ESP8266 board.
- * 
- * @date +05:30 10:41:29 PM 27-10-2024, Sunday
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
+/*
+  Filename: ModbusRTU_Client_LED.ino [ESP8266]
+  Description: This example demonstrates the use of a Modbus RTU client to control an LED
+  connected to a remote Modbus RTU server. The client generates periodic requests
+  to the server to turn on and off the LED. The request consists of writing a coil
+  located at address 0x0000. You can use the ModbusRTU_Server_LED example to run
+  the server. We are using hardware serial port for the RS-485 interface.
+
+  This code was tested with the NodeMCU-ESP12E ESP8266 board. For ModbusRTU emulation,
+  you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
+  
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.8
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 20:40:30 PM 22-03-2025, Saturday
  */
 //===================================================================================//
 
@@ -41,19 +44,19 @@ RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX
 // Create a Modbus RTU node instance with the RS485 interface.
 CSE_ModbusRTU modbusRTU (&RS485, 0x02, "modbusRTU-0x02"); // (RS-485 Port, Device Address, Device Name)
 
-// Create a Modbus RTU server instance with the Modbus RTU node.
+// Create a Modbus RTU client instance with the Modbus RTU node.
 CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_ModbusRTU, Client Name)
 
 //===================================================================================//
 
 void setup() {
-  // Initialize the default serial port for debug messages
+  // Initialize the default serial port for debug messages.
   Serial.begin (115200);
   delay (1000);
   Serial.println ("CSE_ModbusRTU - Modbus RTU Client LED");
 
   // Initialize the RS485 port manually.
-  // This particualr begin() call is specific to ESP8266-Arduino.
+  // This particular begin() call is specific to ESP8266-Arduino.
   PORT_RS485.begin (9600, SWSERIAL_8N1, PIN_RS485_RX, PIN_RS485_TX);
 
   // Initialize the RS485 interface. If you are initializing the RS485 interface
