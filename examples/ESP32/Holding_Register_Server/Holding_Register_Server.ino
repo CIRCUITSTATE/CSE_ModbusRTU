@@ -1,19 +1,22 @@
 
 //===================================================================================//
-/**
-  * @file Holding_Register_Server.ino
-  * @brief This example demonstrates how to store Holding Registers at a Server
-  * and respond to a Client's requests to read/write them. You can use the 
-  * `Holding_Register_Client.ino` sketch on the Client side to test the server.
-  * 
-  * This code was tested with the DFRobot FireBeetle 2 board and Modbus Mechanic.
-  * 
-  * @date +05:30 06:23:38 PM 09-11-2024, Saturday
-  * @author Vishnu Mohanan (@vishnumaiea)
-  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  * @par MIT License
-  * 
-  */
+/*
+  Filename: Holding_Register_Server.ino [ESP32]
+  Description: This example demonstrates how to store Holding Registers at a Server
+  and respond to a Client's requests to read/write them. You can use the 
+  `Holding_Register_Client.ino` sketch on the Client side to test the server.
+
+  This code was tested with the DFRobot FireBeetle-ESP32E board. For ModbusRTU emulation,
+  you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
+  
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.8
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 20:09:17 PM 22-03-2025, Saturday
+ */
 //===================================================================================//
 
 #include <CSE_ArduinoRS485.h>

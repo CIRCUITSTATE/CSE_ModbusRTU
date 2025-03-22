@@ -27,7 +27,7 @@ The library can also be installed via [**PlatformIO**](https://platformio.org). 
 
 This library depends on the following libraries:
 
-  - [**CSE_ArduinoRS485**](https://github.com/CIRCUITSTATE/CSE_ArduinoRS485)
+  - [**CSE_ArduinoRS485**](https://github.com/CIRCUITSTATE/CSE_ArduinoRS485) - Generic RS485 interface library for Arduino.
 
 ## Examples
 
@@ -53,3 +53,4 @@ Please see the [API.md](/docs/API.md) file for the API reference.
 - [Modbus RTU tutorial by CIRCUITSTATE](https://www.circuitstate.com/tutorials/what-is-modbus-communication-protocol-and-how-to-implement-modbus-rtu-with-arduino/)
 - [RS-485 tutorial by CIRCUITSTATE](https://www.circuitstate.com/tutorials/what-is-rs-485-how-to-use-max485-with-arduino-for-reliable-long-distance-serial-communication/)
 - [MAX485+CD4069 Module Pinout by CIRCUITSTATE](https://www.circuitstate.com/pinouts/max485-cd4069-rs-485-module-with-auto-data-direction-control-pinout-diagram-and-pin-reference/)
+- [Modbus Mechanic - Modbus RTU Emulation Tool](https://github.com/SciFiDryer/ModbusMechanic)

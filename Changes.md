@@ -5,6 +5,11 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 08:16:16 PM 22-03-2025, Saturday**
+
+  - Updated ESP32 examples and documentation.
+
+#
 ### **+05:30 07:15:57 PM 21-03-2025, Friday**
 
   - Updated Readme.

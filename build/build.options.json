@@ -1,5 +1,5 @@
 {
-  "additionalFiles": "",
+  "additionalFiles": "..\\..",
   "compiler.optimization_flags": "-Os",
   "customBuildProperties": "build.warn_data_percentage=75",
   "fqbn": "esp32:esp32:esp32doit-devkit-v1:FlashFreq=80,UploadSpeed=921600,DebugLevel=none,EraseFlash=none",

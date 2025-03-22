@@ -1,19 +1,22 @@
 
 //===================================================================================//
-/**
-  * @file Holding_Register_Client.ino
-  * @brief This example demonstrates how to read/write Holding Registers at a Server.
-  * You can use the `Holding_Register_Server.ino` sketch on the Server side to respond
-  * to the requests from the Client.
-  * 
-  * This code was tested with the DFRobot FireBeetle 2 board.
-  * 
-  * @date +05:30 06:38:39 PM 09-11-2024, Saturday
-  * @author Vishnu Mohanan (@vishnumaiea)
-  * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  * @par MIT License
-  * 
-  */
+/*
+  Filename: Holding_Register_Client.ino [ESP32]
+  Description: This example demonstrates how to read/write Holding Registers at a Server.
+  You can use the `Holding_Register_Server.ino` sketch on the Server side to respond
+  to the requests from the Client.
+
+  This code was tested with the DFRobot FireBeetle-ESP32E board. For ModbusRTU emulation,
+  you can use the Modbus Mechanic (https://github.com/SciFiDryer/ModbusMechanic) software.
+  
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.8
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 19:57:14 PM 22-03-2025, Saturday
+ */
 //===================================================================================//
 
 #include <CSE_ArduinoRS485.h>
@@ -35,7 +38,7 @@ RS485Class RS485 (PORT_RS485, -1, -1, PIN_RS485_TX); // (Serial Port, DE, RE, TX
 // Create a Modbus RTU node instance with the RS485 interface.
 CSE_ModbusRTU modbusRTU (&RS485, 0x02, "modbusRTU-0x02"); // (RS-485 Port, Device Address, Device Name)
 
-// Create a Modbus RTU server instance with the Modbus RTU node.
+// Create a Modbus RTU client instance with the Modbus RTU node.
 CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_ModbusRTU, Client Name)
 
 // Create an array to hold the values read from the Server.
@@ -57,7 +60,7 @@ void setup() {
   // manually, then the parameter can be empty.
   RS485.begin();
 
-  // Initialize the Modbus RTU server.
+  // Initialize the Modbus RTU client.
   modbusRTUClient.begin();
 
   // Set the address of the Server you want to communicate with.
