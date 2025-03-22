@@ -35,8 +35,8 @@ Four examples are included with this library:
 
   - **ModbusRTU_Client_LED** - Acts as a Modbus RTU Client and sends periodic requests to a Modbus RTU Server to control an LED via Coil data.
   - **ModbusRTU_Server_LED** - Acts as a Modbus RTU Server and responds to requests from a Modbus RTU Client to control an LED using Coil data.
-  - **Holding_Register_Client** - Acts as a Modbus RTU Server and responds to requests from a Modbus RTU Client to control an LED using Coil data.
-  - **Holding_Register_Server** - Acts as a Modbus RTU Server and responds to requests from a Modbus RTU Client to control an LED using Coil data.
+  - **Holding_Register_Server** - Acts as a Modbus RTU Server that responds to requests from a Modbus RTU Client to read and write Holding Registers.
+  - **Holding_Register_Client** - Acts as a Modbus RTU Client that sends periodic requests to a Modbus RTU Server to read and write Holding Registers.
 
 The examples are categorized for three different target boards.
 
