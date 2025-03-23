@@ -32,45 +32,45 @@
 //======================================================================================//
 
 // Modbus constants and limits
-#define   MODBUS_RTU_ADU_LENGTH_MAX                     256
-#define   MODBUS_RTU_PDU_LENGTH_MAX                     253
-#define   MODBUS_RTU_ADDR_LENGTH_MAX                    2
-#define   MODBUS_RTU_CRC_LENGTH                         2
-#define   MODBUS_RTU_ADU_ADDRESS_INDEX                  0
-#define   MODBUS_RTU_ADU_FUNCTION_CODE_INDEX            1
-#define   MODBUS_RTU_ADU_EXCEPTION_CODE_INDEX           2
-#define   MODBUS_RTU_ADU_DATA_LENGTH_MAX                252  // Doesn't include the function code
-#define   MODBUS_RTU_ADU_DATA_INDEX                     2
-#define   MODBUS_RTU_COIL_COUNT_MAX                     100
-#define   MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX           100
-#define   MODBUS_RTU_INPUT_REGISTER_COUNT_MAX           100
-#define   MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX         100
+#define   MODBUS_RTU_ADU_LENGTH_MAX                     256U
+#define   MODBUS_RTU_PDU_LENGTH_MAX                     253U
+#define   MODBUS_RTU_ADDR_LENGTH_MAX                    2U
+#define   MODBUS_RTU_CRC_LENGTH                         2U
+#define   MODBUS_RTU_ADU_ADDRESS_INDEX                  0U
+#define   MODBUS_RTU_ADU_FUNCTION_CODE_INDEX            1U
+#define   MODBUS_RTU_ADU_EXCEPTION_CODE_INDEX           2U
+#define   MODBUS_RTU_ADU_DATA_LENGTH_MAX                252U  // Doesn't include the function code
+#define   MODBUS_RTU_ADU_DATA_INDEX                     2U
+#define   MODBUS_RTU_COIL_COUNT_MAX                     100U
+#define   MODBUS_RTU_DISCRETE_INPUT_COUNT_MAX           100U
+#define   MODBUS_RTU_INPUT_REGISTER_COUNT_MAX           100U
+#define   MODBUS_RTU_HOLDING_REGISTER_COUNT_MAX         100U
 
 // Modbus function codes
-#define   MODBUS_FC_READ_COILS                          0x01
-#define   MODBUS_FC_READ_DISCRETE_INPUTS                0x02
-#define   MODBUS_FC_READ_HOLDING_REGISTERS              0x03
-#define   MODBUS_FC_READ_INPUT_REGISTERS                0x04
-#define   MODBUS_FC_WRITE_SINGLE_COIL                   0x05
-#define   MODBUS_FC_WRITE_SINGLE_REGISTER               0x06
-#define   MODBUS_FC_READ_EXCEPTION_STATUS               0x07
-#define   MODBUS_FC_WRITE_MULTIPLE_COILS                0x0F
-#define   MODBUS_FC_WRITE_MULTIPLE_REGISTERS            0x10
-#define   MODBUS_FC_REPORT_SERVER_ID                    0x11
-#define   MODBUS_FC_MASK_WRITE_REGISTER                 0x16
-#define   MODBUS_FC_WRITE_AND_READ_REGISTERS            0x17
+#define   MODBUS_FC_READ_COILS                          0x01U
+#define   MODBUS_FC_READ_DISCRETE_INPUTS                0x02U
+#define   MODBUS_FC_READ_HOLDING_REGISTERS              0x03U
+#define   MODBUS_FC_READ_INPUT_REGISTERS                0x04U
+#define   MODBUS_FC_WRITE_SINGLE_COIL                   0x05U
+#define   MODBUS_FC_WRITE_SINGLE_REGISTER               0x06U
+#define   MODBUS_FC_READ_EXCEPTION_STATUS               0x07U
+#define   MODBUS_FC_WRITE_MULTIPLE_COILS                0x0FU
+#define   MODBUS_FC_WRITE_MULTIPLE_REGISTERS            0x10U
+#define   MODBUS_FC_REPORT_SERVER_ID                    0x11U
+#define   MODBUS_FC_MASK_WRITE_REGISTER                 0x16U
+#define   MODBUS_FC_WRITE_AND_READ_REGISTERS            0x17U
 
 // Modbus exception codes
-#define   MODBUS_EX_ILLEGAL_FUNCTION                    0x01
-#define   MODBUS_EX_ILLEGAL_DATA_ADDRESS                0x02
-#define   MODBUS_EX_ILLEGAL_DATA_VALUE                  0x03
-#define   MODBUS_EX_SERVER_DEVICE_FAILURE               0x04
-#define   MODBUS_EX_ACKNOWLEDGE                         0x05
-#define   MODBUS_EX_SERVER_DEVICE_BUSY                  0x06
-#define   MODBUS_EX_NEGATIVE_ACKNOWLEDGE                0x07
-#define   MODBUS_EX_MEMORY_PARITY_ERROR                 0x08
-#define   MODBUS_EX_GATEWAY_PATH_UNAVAILABLE            0x0A
-#define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0B
+#define   MODBUS_EX_ILLEGAL_FUNCTION                    0x01U
+#define   MODBUS_EX_ILLEGAL_DATA_ADDRESS                0x02U
+#define   MODBUS_EX_ILLEGAL_DATA_VALUE                  0x03U
+#define   MODBUS_EX_SERVER_DEVICE_FAILURE               0x04U
+#define   MODBUS_EX_ACKNOWLEDGE                         0x05U
+#define   MODBUS_EX_SERVER_DEVICE_BUSY                  0x06U
+#define   MODBUS_EX_NEGATIVE_ACKNOWLEDGE                0x07U
+#define   MODBUS_EX_MEMORY_PARITY_ERROR                 0x08U
+#define   MODBUS_EX_GATEWAY_PATH_UNAVAILABLE            0x0AU
+#define   MODBUS_EX_GATEWAY_TARGET_NO_RESPONSE          0x0BU
 
 //======================================================================================//
 // This section allows you to configure the debug message printing capability of the library.

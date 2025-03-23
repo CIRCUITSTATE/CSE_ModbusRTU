@@ -5,6 +5,12 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 03:30:25 PM 23-03-2025, Sunday**
+
+  - Changed all defined constant values to unsigned explicitly.
+    - This will hopefully fix the warning reported by Issue [#12](https://github.com/CIRCUITSTATE/CSE_ModbusRTU/issues/12)
+
+#
 ### **+05:30 03:20:53 PM 23-03-2025, Sunday**
 
   - Updated RP2040 examples.
