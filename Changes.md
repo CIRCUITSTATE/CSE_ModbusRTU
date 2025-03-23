@@ -5,9 +5,14 @@ Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 
 #
+### **+05:30 03:20:53 PM 23-03-2025, Sunday**
+
+  - Updated RP2040 examples.
+
+#
 ### **+05:30 01:41:13 PM 23-03-2025, Sunday**
 
-  - Added holding register examples for RP2040.
+  - Added LED examples for RP2040.
 
 #
 ### **+05:30 09:09:51 PM 22-03-2025, Saturday**
