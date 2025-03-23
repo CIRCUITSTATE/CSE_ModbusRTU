@@ -1,7 +1,7 @@
 {
-    "board": "esp8266:esp8266:nodemcuv2",
-    "sketch": "examples\\ESP8266\\Holding_Register_Server\\Holding_Register_Server.ino",
+    "board": "rp2040:rp2040:rpipico",
+    "sketch": "examples\\RP2040\\ModbusRTU_Server_LED\\ModbusRTU_Server_LED.ino",
     "port": "COM5",
     "output": "build",
-    "configuration": "xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,led=2,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200"
+    "configuration": "flash=2097152_0,freq=133,opt=Small,rtti=Disabled,stackprotect=Disabled,exceptions=Disabled,dbgport=Disabled,dbglvl=None,usbstack=picosdk,ipbtstack=ipv4only,uploadmethod=default"
 }
