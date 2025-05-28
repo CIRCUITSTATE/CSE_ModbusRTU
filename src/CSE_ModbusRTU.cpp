@@ -1278,7 +1278,7 @@ int CSE_ModbusRTU_Server:: poll() {
       uint8_t byteCount = request.getByte (MODBUS_RTU_ADU_DATA_INDEX + 4); // Get the byte count
 
       // Now we need to copy the coil data from the request ADU
-      for (int i, j = 0; i < byteCount; i++) {
+      for (int i = 0, j = 0; i < byteCount; i++) {
         for (int k = 0; ((k < 8) && (j < request.getQuantity())); k++) {
           coilData [j] = (request.getByte (MODBUS_RTU_ADU_DATA_INDEX + 5 + i) >> k) & 0x01;
           j++;
@@ -1331,7 +1331,7 @@ int CSE_ModbusRTU_Server:: poll() {
       uint8_t byteCount = request.getByte (MODBUS_RTU_ADU_DATA_INDEX + 4); // Get the byte count
 
       // Now we need to copy the holding register data from the request ADU
-      for (int i, j = 0; i < byteCount; i += 2) {
+      for (int i = 0, j = 0; i < byteCount; i += 2) {
         holdingRegisterData [j] = request.getWord (MODBUS_RTU_ADU_DATA_INDEX + 5 + i);
         j++;
       }
