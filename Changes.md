@@ -3,6 +3,14 @@
 
 Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
+#
+### **+05:30 07:12:26 PM 28-05-2025, Wednesday**
+
+  - Merged PR [#13](https://github.com/CIRCUITSTATE/CSE_ModbusRTU/pull/13) from [@AlexSeferidis](https://github.com/AlexSeferidis).
+    - This fixes the non-initialization of `i` index variable in multiple loops in `poll()` function.
+    - This was presumably causing the issue reported in [Issue #12](https://github.com/CIRCUITSTATE/CSE_ModbusRTU/issues/11)
+  - Updated file meta formats.
+  - New Version 🆕 `0.0.9`.
 
 #
 ### **+05:30 03:30:25 PM 23-03-2025, Sunday**

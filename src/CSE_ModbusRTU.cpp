@@ -1,14 +1,15 @@
 
 //======================================================================================//
-/**
- * @file CSE_ModbusRTU.cpp
- * @brief Main source file for the CSE_ModbusRTU library.
- * @date +05:30 09:55:57 AM 27-10-2024, Sunday
- * @version 0.0.8
- * @author Vishnu Mohanan (@vishnumaiea)
- * @par GitHub Repository: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
- * @par MIT License
- * 
+/*
+  Filename: CSE_ModbusRTU.cpp
+  Description: Main source file for the CSE_ModbusRTU library.
+  Framework: Arduino, PlatformIO
+  Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
+  Maintainer: CIRCUITSTATE Electronics (@circuitstate)
+  Version: 0.0.9
+  License: MIT
+  Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
+  Last Modified: +05:30 19:09:06 PM 28-05-2025, Wednesday
  */
 //======================================================================================//
 
