@@ -1156,7 +1156,7 @@ int CSE_ModbusRTU_Server:: poll() {
       // Read the register data from the input registers and write them to the array
       for (int i = request.getStartingAddress(), j = 0; i < (request.getStartingAddress() + request.getQuantity()); i++) {
         for (int k = 0; k < inputRegisters.size(); k++) {
-          if (holdingRegisters [k].address == i) {
+          if (inputRegisters [k].address == i) {
             inputRegisterData [j] = inputRegisters [k].value >> 8; // Get the high byte
             inputRegisterData [j + 1] = inputRegisters [k].value & 0xFF; // Get the low byte
             j += 2;
