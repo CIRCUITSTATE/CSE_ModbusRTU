@@ -1,6 +1,6 @@
 # CSE_ModbusRTU Library API Reference
 
-Version 0.0.8, +05:30 09:55:19 AM 27-10-2024, Sunday
+Version 0.0.10, +05:30 01:24:51 PM 22-03-2026, Sunday
 
 ## Index
 
@@ -878,7 +878,7 @@ None
 
 ### `poll()`
 
-This function is used to poll the serial port for new requests. When a request is received, it is disassembled into the `request` ADU and checked for validity. This function takes care of checking what type of request it is and then send a response back to the client. The response is assembled into the `response` ADU. Finally, the type of request received is returned.
+This function is used to poll the serial port for new requests. When a request is received, it is disassembled into the `request` ADU and checked for validity. This function takes care of checking what type of request it is and then send a response back to the client. The response is assembled into the `response` ADU. Finally, the type of request received or an exception code is returned. You can check the value of the request and perform any additional operations based on it.
 
 #### Syntax
 

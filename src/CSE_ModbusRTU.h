@@ -9,7 +9,7 @@
   Version: 0.0.10
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 11:15:25 AM 22-03-2026, Sunday
+  Last Modified: +05:30 12:07:44 PM 22-03-2026, Sunday
  */
 //======================================================================================//
 
@@ -126,14 +126,19 @@ class CSE_ModbusRTU_Debug;
  */
 class CSE_ModbusRTU_Debug {
   public:
-    // Function to enable debug messages
+    // Enables the debug messages from CSE_ModbusRTU library. Set the serial port at `MODBUS_DEBUG_SERIAL`.
     static void enableDebugMessages() {
       debugEnabled = true;
     }
 
-    // Function to disable debug messages
+    // Disables the debug messages from CSE_ModbusRTU library. Set the serial port at `MODBUS_DEBUG_SERIAL`.
     static void disableDebugMessages() {
       debugEnabled = false;
+    }
+
+    // Returns `true` if the debug messages are enabled, `false` otherwise.
+    static bool isDebugEnabled() {
+      return debugEnabled;
     }
 
     // Friend class declaration

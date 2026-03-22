@@ -15,7 +15,7 @@
   Library Version: 0.0.9
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:11:01 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 13:22:21 PM 22-03-2026, Sunday
  */
 //===================================================================================//
 
@@ -29,6 +29,7 @@
 #define PIN_RS485_TX        12
 
 #define PORT_RS485          softSerial // The software serial port for the RS-485 interface
+#define PORT_SERIAL         Serial // Serial port for debug messages
 
 //===================================================================================//
 
@@ -48,9 +49,9 @@ CSE_ModbusRTU_Server modbusRTUServer (modbusRTU, "modbusRTUServer"); // (CSE_Mod
 //===================================================================================//
 void setup() {
   // Initialize the default serial port for debug messages.
-  Serial.begin (115200);
+  PORT_SERIAL.begin (115200);
   delay (1000);
-  Serial.println ("CSE_ModbusRTU - Holding Register Server");
+  PORT_SERIAL.println ("CSE_ModbusRTU - Holding Register Server");
 
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP8266-Arduino.

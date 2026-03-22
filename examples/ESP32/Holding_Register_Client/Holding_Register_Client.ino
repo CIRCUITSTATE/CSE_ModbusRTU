@@ -15,7 +15,7 @@
   Library Version: 0.0.9
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:10:27 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 11:45:55 AM 22-03-2026, Sunday
  */
 //===================================================================================//
 
@@ -29,6 +29,7 @@
 #define   PIN_RS485_TX        17
 
 #define   PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
+#define   PORT_SERIAL         Serial // Serial port for debug messages
 
 //===================================================================================//
 
@@ -47,9 +48,9 @@ uint16_t holdingRegisters [10] = {0};
 //===================================================================================//
 void setup() {
   // Initialize the default serial port for debug messages.
-  Serial.begin (115200);
+  PORT_SERIAL.begin (115200);
   delay (1000);
-  Serial.println ("CSE_ModbusRTU - Holding Register Client");
+  PORT_SERIAL.println ("CSE_ModbusRTU - Holding Register Client");
 
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
@@ -76,100 +77,100 @@ void setup() {
 
 void loop() {
   // Read a single Holding Register.
-  Serial.println ("Reading a single Holding Register at 0x00..");
+  PORT_SERIAL.println ("Reading a single Holding Register at 0x00..");
 
   holdingRegisters [0] = 0;
 
   if (modbusRTUClient.readHoldingRegister (0x00, 1, holdingRegisters) == -1) {
-    Serial.println ("Reading the Holding Register failed.");
+    PORT_SERIAL.println ("Reading the Holding Register failed.");
   }
   else {
-    Serial.print ("Reading the Holding Register successful. Value = 0x");
-    Serial.println (holdingRegisters [0], HEX);
+    PORT_SERIAL.print ("Reading the Holding Register successful. Value = 0x");
+    PORT_SERIAL.println (holdingRegisters [0], HEX);
   }
 
-  Serial.println();
+  PORT_SERIAL.println();
   delay (500);
 
   //-----------------------------------------------------------------------------------//
 
   // Read multiple Holding Registers.
-  Serial.println ("Reading multiple Holding Registers starting at 0x02..");
+  PORT_SERIAL.println ("Reading multiple Holding Registers starting at 0x02..");
 
   holdingRegisters [0] = 0;
   holdingRegisters [1] = 0;
 
   if (modbusRTUClient.readHoldingRegister (0x02, 2, holdingRegisters) == -1) {
-    Serial.println ("Reading the Holding Registers failed.");
+    PORT_SERIAL.println ("Reading the Holding Registers failed.");
   }
   else {
-    Serial.print ("Reading the Holding Registers successful. Value = 0x");
-    Serial.print (holdingRegisters [0], HEX);
-    Serial.print (", 0x");
-    Serial.println (holdingRegisters [1], HEX);
+    PORT_SERIAL.print ("Reading the Holding Registers successful. Value = 0x");
+    PORT_SERIAL.print (holdingRegisters [0], HEX);
+    PORT_SERIAL.print (", 0x");
+    PORT_SERIAL.println (holdingRegisters [1], HEX);
   }
 
-  Serial.println();
+  PORT_SERIAL.println();
   delay (500);
 
   //-----------------------------------------------------------------------------------//
 
   // Write a single Holding Register.
-  Serial.println ("Writing a single Holding Register at 0x03 to 0x1234..");
+  PORT_SERIAL.println ("Writing a single Holding Register at 0x03 to 0x1234..");
 
   if (modbusRTUClient.writeHoldingRegister (0x03, 0x1234) == -1) {
-    Serial.println ("Writing the Holding Register failed.");
+    PORT_SERIAL.println ("Writing the Holding Register failed.");
   }
   else {
-    Serial.println ("Writing the Holding Register successful.");
+    PORT_SERIAL.println ("Writing the Holding Register successful.");
   }
 
-  Serial.println();
+  PORT_SERIAL.println();
   delay (500);
 
   //-----------------------------------------------------------------------------------//
 
   // Read the value back from the Server.
-  Serial.println ("Reading back the Holding Register at 0x03..");
+  PORT_SERIAL.println ("Reading back the Holding Register at 0x03..");
 
   holdingRegisters [0] = 0;
 
   if (modbusRTUClient.readHoldingRegister (0x03, 1, holdingRegisters) == -1) {
-    Serial.println ("Reading the Holding Register failed.");
+    PORT_SERIAL.println ("Reading the Holding Register failed.");
   }
   else {
-    Serial.print ("Reading the Holding Register successful. Value = 0x");
-    Serial.println (holdingRegisters [0], HEX);
+    PORT_SERIAL.print ("Reading the Holding Register successful. Value = 0x");
+    PORT_SERIAL.println (holdingRegisters [0], HEX);
   }
 
   // Restore the old value.
-  Serial.println ("Restoring the Holding Register at 0x03 to 0x00FF..");
+  PORT_SERIAL.println ("Restoring the Holding Register at 0x03 to 0x00FF..");
   if (modbusRTUClient.writeHoldingRegister (0x03, 0x00FF) == -1) {
-    Serial.println ("Writing the Holding Register failed.");
+    PORT_SERIAL.println ("Writing the Holding Register failed.");
   }
   else {
-    Serial.println ("Writing the Holding Register successful.");
+    PORT_SERIAL.println ("Writing the Holding Register successful.");
   }
 
-  Serial.println();
+  PORT_SERIAL.println();
   delay (500);
 
   //-----------------------------------------------------------------------------------//
 
   // Write multiple Holding Registers.
-  Serial.println ("Writing multiple Holding Registers starting at 0x02 with values 0x1717 & 0xF00F..");
+  PORT_SERIAL.println ("Writing multiple Holding Registers starting at 0x02 with values 0x1717 & 0xF00F..");
 
   holdingRegisters [0] = 0x1717;
   holdingRegisters [1] = 0xF00F;
 
   if (modbusRTUClient.writeHoldingRegister (0x02, 2, holdingRegisters) == -1) {
-    Serial.println ("Writing the Holding Registers failed.");
+    PORT_SERIAL.println ("Writing the Holding Registers failed.");
   }
   else {
-    Serial.println ("Writing the Holding Registers successful.");
+    PORT_SERIAL.println ("Writing the Holding Registers successful.");
   }
 
-  Serial.println();
+  PORT_SERIAL.println();
   delay (500);
 
   //-----------------------------------------------------------------------------------//
@@ -178,30 +179,30 @@ void loop() {
   holdingRegisters [0] = 0;
   holdingRegisters [1] = 0;
 
-  Serial.println ("Reading back the Holding Registers at 0x02..");
+  PORT_SERIAL.println ("Reading back the Holding Registers at 0x02..");
   if (modbusRTUClient.readHoldingRegister (0x02, 2, holdingRegisters) == -1) {
-    Serial.println ("Reading the Holding Registers failed.");
+    PORT_SERIAL.println ("Reading the Holding Registers failed.");
   }
   else {
-    Serial.print ("Reading the Holding Registers successful. Value = 0x");
-    Serial.print (holdingRegisters [0], HEX);
-    Serial.print (", 0x");
-    Serial.println (holdingRegisters [1], HEX);
+    PORT_SERIAL.print ("Reading the Holding Registers successful. Value = 0x");
+    PORT_SERIAL.print (holdingRegisters [0], HEX);
+    PORT_SERIAL.print (", 0x");
+    PORT_SERIAL.println (holdingRegisters [1], HEX);
   }
 
   // Restore the old values.
   holdingRegisters [0] = 0xFF00;
   holdingRegisters [1] = 0x00FF;
 
-  Serial.println ("Restoring the Holding Registers at 0x02 with values 0xFF00 & 0x00FF..");
+  PORT_SERIAL.println ("Restoring the Holding Registers at 0x02 with values 0xFF00 & 0x00FF..");
   if (modbusRTUClient.writeHoldingRegister (0x02, 2, holdingRegisters) == -1) {
-    Serial.println ("Writing the Holding Registers failed.");
+    PORT_SERIAL.println ("Writing the Holding Registers failed.");
   }
   else {
-    Serial.println ("Writing the Holding Registers successful.");
+    PORT_SERIAL.println ("Writing the Holding Registers successful.");
   }
 
-  Serial.println();
+  PORT_SERIAL.println();
   delay (500);
 }
 

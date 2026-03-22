@@ -17,7 +17,7 @@
   Library Version: 0.0.9
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:10:40 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 13:20:40 PM 22-03-2026, Sunday
  */
 //===================================================================================//
 
@@ -31,6 +31,7 @@
 #define PIN_RS485_TX        17
 
 #define PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
+#define PORT_SERIAL         Serial // Serial port for debug messages
 
 //===================================================================================//
 
@@ -47,9 +48,9 @@ CSE_ModbusRTU_Client modbusRTUClient (modbusRTU, "modbusRTUClient"); // (CSE_Mod
 
 void setup() {
   // Initialize the default serial port for debug messages.
-  Serial.begin (115200);
+  PORT_SERIAL.begin (115200);
   delay (1000);
-  Serial.println ("CSE_ModbusRTU - Modbus RTU Client LED");
+  PORT_SERIAL.println ("CSE_ModbusRTU - Modbus RTU Client LED");
 
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
@@ -73,19 +74,19 @@ void setup() {
 
 void loop() {
   if (modbusRTUClient.writeCoil (0x00, 0xFF00) == -1) { // Turn on the LED
-    Serial.println ("Turning on the LED failed.");
+    PORT_SERIAL.println ("Turning on the LED failed.");
   }
   else {
-    Serial.println ("Turning on the LED successful.");
+    PORT_SERIAL.println ("Turning on the LED successful.");
   }
 
   delay (1000);
 
   if (modbusRTUClient.writeCoil (0x00, 0x0000) == -1) { // Turn off the LED
-    Serial.println ("Turning off the LED failed.");
+    PORT_SERIAL.println ("Turning off the LED failed.");
   }
   else {
-    Serial.println ("Turning off the LED successful.");
+    PORT_SERIAL.println ("Turning off the LED successful.");
   }
   delay (1000);
 }

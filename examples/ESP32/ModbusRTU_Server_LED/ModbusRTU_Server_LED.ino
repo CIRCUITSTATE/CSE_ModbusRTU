@@ -17,7 +17,7 @@
   Library Version: 0.0.9
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:10:45 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 13:21:07 PM 22-03-2026, Sunday
  */
 //===================================================================================//
 
@@ -31,6 +31,7 @@
 #define PIN_RS485_TX        17
 
 #define PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
+#define PORT_SERIAL         Serial // Serial port for debug messages
 
 //===================================================================================//
 
@@ -49,9 +50,9 @@ CSE_ModbusRTU_Server modbusRTUServer (modbusRTU, "modbusRTUServer"); // (CSE_Mod
 
 void setup() {
   // Initialize the default serial port for debug messages.
-  Serial.begin (115200);
+  PORT_SERIAL.begin (115200);
   delay (1000);
-  Serial.println ("CSE_ModbusRTU - Modbus RTU Server LED");
+  PORT_SERIAL.println ("CSE_ModbusRTU - Modbus RTU Server LED");
 
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
@@ -87,7 +88,7 @@ void loop() {
   int requestReceived = modbusRTUServer.poll();
 
   if ((requestReceived != -1) && (requestReceived < 0x80)) {
-    Serial.println ("Request received");
+    PORT_SERIAL.println ("Request received");
     // Read the current value of the coil.
     int coilValue = modbusRTUServer.readCoil (0x00);
   
@@ -100,7 +101,7 @@ void loop() {
       digitalWrite (ledPin, LOW);
     }
     else {
-      Serial.println ("Error reading coil");
+      PORT_SERIAL.println ("Error reading coil");
     }
   }
 }

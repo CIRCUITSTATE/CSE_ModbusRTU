@@ -9,7 +9,7 @@
   Version: 0.0.10
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 11:15:29 AM 22-03-2026, Sunday
+  Last Modified: +05:30 13:24:22 PM 22-03-2026, Sunday
  */
 //======================================================================================//
 

@@ -4,6 +4,14 @@
 Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 #
+### **+05:30 01:27:37 PM 22-03-2026, Sunday**
+
+  - Updated the examples.
+  - Updated library meta.
+  - Updated the API documentation.
+  - No version change.
+
+#
 ### **+05:30 11:15:48 AM 22-03-2026, Sunday**
 
   - Updated debug message format.

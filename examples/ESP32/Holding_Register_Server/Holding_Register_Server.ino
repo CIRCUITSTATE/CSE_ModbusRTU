@@ -15,7 +15,7 @@
   Library Version: 0.0.9
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:10:33 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 12:12:29 PM 22-03-2026, Sunday
  */
 //===================================================================================//
 
@@ -29,6 +29,7 @@
 #define   PIN_RS485_TX        17
 
 #define   PORT_RS485          Serial1 // The hardware serial port for the RS-485 interface
+#define   PORT_SERIAL         Serial // Serial port for debug messages
 
 //===================================================================================//
 
@@ -44,9 +45,9 @@ CSE_ModbusRTU_Server modbusRTUServer (modbusRTU, "modbusRTUServer"); // (CSE_Mod
 //===================================================================================//
 void setup() {
   // Initialize the default serial port for debug messages.
-  Serial.begin (115200);
+  PORT_SERIAL.begin (115200);
   delay (1000);
-  Serial.println ("CSE_ModbusRTU - Holding Register Server");
+  PORT_SERIAL.println ("CSE_ModbusRTU - Holding Register Server");
 
   // Initialize the RS485 port manually.
   // This particualr begin() call is specific to ESP32-Arduino.
@@ -79,7 +80,54 @@ void setup() {
 void loop() {
   // Poll for Modbus RTU requests.
   int requestReceived = modbusRTUServer.poll();
-  delay (10)
+
+  if (!CSE_ModbusRTU_Debug:: isDebugEnabled()) {
+    if ((requestReceived != -1) && (requestReceived < 0x80)) {
+      // Print the type of request received.
+      if (requestReceived == MODBUS_FC_READ_COILS) {
+        PORT_SERIAL.println ("Request received to read coils.");
+      }
+      else if (requestReceived == MODBUS_FC_READ_DISCRETE_INPUTS) {
+        PORT_SERIAL.println ("Request received to read discrete inputs.");
+      }
+      else if (requestReceived == MODBUS_FC_READ_HOLDING_REGISTERS) {
+        PORT_SERIAL.println ("Request received to read holding registers.");
+      }
+      else if (requestReceived == MODBUS_FC_READ_INPUT_REGISTERS) {
+        PORT_SERIAL.println ("Request received to read input registers.");
+      }
+      else if (requestReceived == MODBUS_FC_WRITE_SINGLE_COIL) {
+        PORT_SERIAL.println ("Request received to write single coil.");
+      }
+      else if (requestReceived == MODBUS_FC_WRITE_SINGLE_REGISTER) {
+        PORT_SERIAL.println ("Request received to write single register.");
+      }
+      else if (requestReceived == MODBUS_FC_WRITE_MULTIPLE_COILS) {
+        PORT_SERIAL.println ("Request received to write multiple coils.");
+      }
+      else if (requestReceived == MODBUS_FC_WRITE_MULTIPLE_REGISTERS) {
+        PORT_SERIAL.println ("Request received to write multiple registers.");
+      }
+
+      //--------------------------------------------------------------------------------------------//
+    
+      if (requestReceived >= 0x80) {
+        int functionCode = requestReceived - 0x80;
+
+        if (functionCode == MODBUS_FC_READ_COILS) {
+          PORT_SERIAL.println ("Exception request received to read coils.");
+        }
+        else if (functionCode == MODBUS_FC_WRITE_SINGLE_COIL) {
+          PORT_SERIAL.println ("Exception request received to write a single coil.");
+        }
+        else if (functionCode == MODBUS_FC_WRITE_MULTIPLE_COILS) {
+          PORT_SERIAL.println ("Exception request received to write multiple coils.");
+        }
+      }
+    }
+  }
+  
+  delay (10);
 }
 
 //===================================================================================//
