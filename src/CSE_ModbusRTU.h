@@ -6,10 +6,10 @@
   Framework: Arduino, PlatformIO
   Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
   Maintainer: CIRCUITSTATE Electronics (@circuitstate)
-  Version: 0.0.9
+  Version: 0.0.10
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:08:33 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 11:15:25 AM 22-03-2026, Sunday
  */
 //======================================================================================//
 

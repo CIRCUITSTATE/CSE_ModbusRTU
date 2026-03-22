@@ -4,6 +4,12 @@
 Change log for `CSE_ModbusRTU` library. Latest entries are at the top.
 
 #
+### **+05:30 11:15:48 AM 22-03-2026, Sunday**
+
+  - Updated debug message format.
+  - New version 🆕 `0.0.10`.
+
+#
 ### **+05:30 07:12:26 PM 28-05-2025, Wednesday**
 
   - Merged PR [#13](https://github.com/CIRCUITSTATE/CSE_ModbusRTU/pull/13) from [@AlexSeferidis](https://github.com/AlexSeferidis).

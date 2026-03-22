@@ -6,10 +6,10 @@
   Framework: Arduino, PlatformIO
   Author: Vishnu Mohanan (@vishnumaiea, @vizmohanan)
   Maintainer: CIRCUITSTATE Electronics (@circuitstate)
-  Version: 0.0.9
+  Version: 0.0.10
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 08:45:36 AM 27-11-2025, Thursday
+  Last Modified: +05:30 11:15:29 AM 22-03-2026, Sunday
  */
 //======================================================================================//
 
@@ -24,7 +24,7 @@ bool CSE_ModbusRTU_Debug:: debugEnabled = false;
  * instantiation.
  * 
  */
-CSE_ModbusRTU_ADU::CSE_ModbusRTU_ADU() {
+CSE_ModbusRTU_ADU:: CSE_ModbusRTU_ADU() {
   clear();
 }
 
@@ -207,7 +207,7 @@ bool CSE_ModbusRTU_ADU:: checkCRC() {
   // If the ADU length is less than 3, that means that the device address, function code,
   // and data are not set yet. In this case, we can't calculate the CRC.
   if (aduLength < 3) {
-    DEBUG_PRINTLN (F("checkCRC(): Error - ADU length is less than 3."));
+    DEBUG_PRINTLN (F("checkCRC [ERROR]: ADU length is less than 3."));
     return false;
   }
 
@@ -215,11 +215,11 @@ bool CSE_ModbusRTU_ADU:: checkCRC() {
   uint16_t crc = calculateCRC (true);
 
   if ((aduBuffer [aduLength - 2] == (uint8_t) (crc & 0xFF)) && (aduBuffer [aduLength - 1] == (uint8_t) (crc >> 8))) {
-    // DEBUG_PRINTLN (F("checkCRC(): CRCs match."));
+    // DEBUG_PRINTLN (F("checkCRC [OK]: CRCs match."));
     return true;
   }
   else {
-    DEBUG_PRINT (F("checkCRC(): Error - CRCs do not match. Found: 0x"));
+    DEBUG_PRINT (F("checkCRC [ERROR]: CRCs do not match. Found: 0x"));
     DEBUG_PRINT (aduBuffer [aduLength - 2], HEX);
     DEBUG_PRINT (aduBuffer [aduLength - 1], HEX);
     DEBUG_PRINT (F(", Calculated: 0x"));
@@ -450,7 +450,7 @@ uint16_t CSE_ModbusRTU_ADU:: setCRC() {
   // If the ADU length is less than 3, that means that the device address, function code,
   // and data are not set yet. In this case, we can't set the data.
   if (aduLength < 3) {
-    DEBUG_PRINTLN (F("setCRC(): ADU length is less than 3. Can't set CRC."));
+    DEBUG_PRINTLN (F("setCRC [ERROR]: ADU length is less than 3. Can't set CRC."));
     return 0x0000;
   }
 
@@ -460,7 +460,7 @@ uint16_t CSE_ModbusRTU_ADU:: setCRC() {
   aduBuffer [aduLength++] = (uint8_t) (crc & 0xFF); // Low byte
   aduBuffer [aduLength++] = (uint8_t) (crc >> 8); // High byte
 
-  DEBUG_PRINT (F("setCRC(): CRC is 0x"));
+  DEBUG_PRINT (F("setCRC [OK]: CRC is 0x"));
   DEBUG_PRINTLN (crc, HEX);
 
   return crc;
@@ -620,7 +620,7 @@ int CSE_ModbusRTU_ADU:: getType() {
  */
 void CSE_ModbusRTU_ADU:: print() {
   // Print the ADU as a hex string
-  DEBUG_PRINT ("ADU: ");
+  DEBUG_PRINT ("print [INFO]: ADU: ");
 
   for (uint8_t i = 0; i < aduLength; i++) {
     if (aduBuffer [i] < 0x10) {
@@ -776,7 +776,7 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout) {
 
   // Print the ADU
   if (adu.getLength() > 0) {
-    DEBUG_PRINT (F("receive(): Received ADU:"));
+    DEBUG_PRINT (F("receive [INFO]: Received ADU:"));
     for (int i = 0; i < adu.getLength(); i++) {
       DEBUG_PRINT (" ");
       if (adu.getByte (i) < 0x10) {
@@ -794,11 +794,11 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout) {
   // Now check if the ADU is valid. We can do this by simply checking the CRC of the ADU.
   if (adu.getLength() > 0) {
     if (adu.checkCRC()) { // Check the CRC of the ADU
-      DEBUG_PRINTLN (F("receive(): ADU CRC passed"));
+      DEBUG_PRINTLN (F("receive [INFO]: ADU CRC passed."));
       return (int) adu.getLength(); // Return the length of the ADU
     }
     else {
-      DEBUG_PRINTLN (F("receive(): ADU CRC failed"));
+      DEBUG_PRINTLN (F("receive [ERROR]: ADU CRC failed."));
     }
   }
   
@@ -817,7 +817,7 @@ int CSE_ModbusRTU:: receive (CSE_ModbusRTU_ADU& adu, uint32_t timeout) {
 int CSE_ModbusRTU:: send (CSE_ModbusRTU_ADU& adu) {
   // Check if the ADU is valid
   if (adu.checkCRC()) {
-    DEBUG_PRINT (F("send(): Sending ADU:"));
+    DEBUG_PRINT (F("send [INFO]: Sending ADU:"));
 
     // Print the ADU
     for (int i = 0; i < adu.getLength(); i++) {
@@ -845,7 +845,7 @@ int CSE_ModbusRTU:: send (CSE_ModbusRTU_ADU& adu) {
     return adu.getLength(); // Return the length of the ADU
   }
 
-  DEBUG_PRINTLN (F("send(): CRC checking failed!"));
+  DEBUG_PRINTLN (F("send [ERROR]: CRC checking failed!"));
   adu.print();
 
   return -1;
@@ -916,14 +916,14 @@ int CSE_ModbusRTU_Server:: poll() {
 
   // Now check if the address of the request matches the address of the server.
   if (request.getDeviceAddress() != rtu->deviceAddress) {
-    DEBUG_PRINTLN (F("poll(): Server addresses does not match."));
+    DEBUG_PRINTLN (F("poll [ERROR]: Server addresses does not match."));
     return -1;
   }
 
   // Check if the ADU received is an exception. A server is not meant to receive
   // a request that is an exception.
   if (request.getExceptionCode() != 0x00) {
-    DEBUG_PRINTLN (F("poll(): Received an exception request to server."));
+    DEBUG_PRINTLN (F("poll [ERROR]: Received an exception request to server."));
     return -1;
   }
 
@@ -944,7 +944,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_COILS + 0x80; // Return the exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to read coils 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to read coils 0x"));
       DEBUG_PRINT (request.getStartingAddress(), HEX);
       DEBUG_PRINT (F(" to 0x"));
       DEBUG_PRINTLN (request.getStartingAddress() + request.getQuantity() - 1, HEX);
@@ -1007,7 +1007,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_DISCRETE_INPUTS + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to read discrete inputs 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to read discrete inputs 0x"));
       DEBUG_PRINT (request.getStartingAddress(), HEX);
       DEBUG_PRINT (F(" to 0x"));
       DEBUG_PRINTLN (request.getStartingAddress() + request.getQuantity() - 1, HEX);
@@ -1060,9 +1060,9 @@ int CSE_ModbusRTU_Server:: poll() {
       // if all of the holding registers in the range are present in the server.
       if ((request.getQuantity() > 0x007D) || (!isHoldingRegisterPresent (request.getStartingAddress(), request.getQuantity()))) {
         // Then process an exception
-        DEBUG_PRINTLN (F("poll(): Invalid request to read holding registers."));
-        DEBUG_PRINTLN (F("poll(): ERROR - Exception: Illegal data value."));
-        DEBUG_PRINTLN (F("poll(): Sending exception response."));
+        DEBUG_PRINTLN (F("poll [ERROR]: Invalid request to read holding registers."));
+        DEBUG_PRINTLN (F("poll [ERROR]: ERROR - Exception: Illegal data value."));
+        DEBUG_PRINTLN (F("poll [INFO]: Sending exception response."));
         response.resetLength(); // Reset the response length
         response.setDeviceAddress (rtu->deviceAddress); // Set the address of the response
         response.setFunctionCode (MODBUS_FC_READ_HOLDING_REGISTERS); // Set the function code of the response
@@ -1073,7 +1073,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_HOLDING_REGISTERS + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to read holding registers 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to read holding registers 0x"));
       DEBUG_PRINT (request.getStartingAddress(), HEX);
       DEBUG_PRINT (F(" to 0x"));
       DEBUG_PRINTLN (request.getStartingAddress() + request.getQuantity() - 1, HEX);
@@ -1134,7 +1134,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_READ_INPUT_REGISTERS + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to read input registers 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to read input registers 0x"));
       DEBUG_PRINT (request.getStartingAddress(), HEX);
       DEBUG_PRINT (F(" to 0x"));
       DEBUG_PRINTLN (request.getStartingAddress() + request.getQuantity() - 1, HEX);
@@ -1195,13 +1195,13 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_WRITE_SINGLE_COIL + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to write single coil 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to write single coil 0x"));
       DEBUG_PRINTLN (request.getStartingAddress(), HEX);
 
       // If the coil is present in the server, we can proceed with writing the coil specified.
       // The coil state will be after the starting address in the request ADU.
       // The state can be either 0x0000 (OFF) or 0xFF00 (ON).
-      DEBUG_PRINT (F("poll(): Writing value 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Writing value 0x"));
       if (request.getWord (MODBUS_RTU_ADU_DATA_INDEX + 2) == 0x00) {
         DEBUG_PRINTLN (F("00"));
         writeCoil (request.getStartingAddress(), 0x00); // Write the coil to the server
@@ -1234,7 +1234,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_WRITE_SINGLE_REGISTER + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to write single register 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to write single register 0x"));
       DEBUG_PRINTLN (request.getStartingAddress(), HEX);
 
       // If the holding register is present in the server, we can proceed with writing the holding register specified.
@@ -1265,7 +1265,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_WRITE_MULTIPLE_COILS + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to write multiple coils 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to write multiple coils 0x"));
       DEBUG_PRINT (request.getStartingAddress(), HEX);
       DEBUG_PRINT (F(" to 0x"));
       DEBUG_PRINTLN (request.getStartingAddress() + request.getQuantity() - 1, HEX);
@@ -1318,7 +1318,7 @@ int CSE_ModbusRTU_Server:: poll() {
         return MODBUS_FC_WRITE_MULTIPLE_REGISTERS + 0x80; // Return exception function code
       }
 
-      DEBUG_PRINT (F("poll(): Received request to write multiple registers 0x"));
+      DEBUG_PRINT (F("poll [INFO]: Received request to write multiple registers 0x"));
       DEBUG_PRINT (request.getStartingAddress(), HEX);
       DEBUG_PRINT (F(" to 0x"));
       DEBUG_PRINTLN (request.getStartingAddress() + request.getQuantity() - 1, HEX);
@@ -1355,9 +1355,9 @@ int CSE_ModbusRTU_Server:: poll() {
     //---------------------------------------------------------------------------------//
     
     default: {
-      DEBUG_PRINT (F("poll(): Received unsupported function code: 0x"));
+      DEBUG_PRINT (F("poll [ERROR]: Received unsupported function code: 0x"));
       DEBUG_PRINTLN (request.getFunctionCode(), HEX);
-      DEBUG_PRINTLN (F("poll(): Returning exception."));
+      DEBUG_PRINTLN (F("poll [WARNING]: Returning exception."));
 
       // Any unsupported function code will be processed as an exception
       response.resetLength(); // Reset the response length
@@ -2176,20 +2176,20 @@ int CSE_ModbusRTU_Client:: writeCoil (uint16_t address, uint16_t value) {
 
   // If the sending fails, return -1
   if (send() < 0) {
-    DEBUG_PRINTLN (F("writeCoil(): Sending request failed!"));
+    DEBUG_PRINTLN (F("writeCoil [ERROR]: Sending request failed!"));
     return -1;
   }
 
   // If the sending doesn't fail, then try receiving the response.
   // If receiving fails, stop and return -1
   if (receive() < 0) {
-    DEBUG_PRINTLN (F("writeCoil(): No response received!"));
+    DEBUG_PRINTLN (F("writeCoil [ERROR]: No response received!"));
     return -1;
   }
 
   // Check if the response ADU has the same device address as the requested one.
   if (response.getDeviceAddress() != rtu->remoteDeviceAddress) {
-    DEBUG_PRINTLN (F("writeCoil(): Address mismatch!"));
+    DEBUG_PRINTLN (F("writeCoil [ERROR]: Address mismatch!"));
     return -1;
   }
 
@@ -2197,16 +2197,16 @@ int CSE_ModbusRTU_Client:: writeCoil (uint16_t address, uint16_t value) {
   // It should be the same as the requested one.
   if (response.getFunctionCode() == MODBUS_FC_WRITE_SINGLE_COIL) {
     response.setType (CSE_ModbusRTU_ADU::aduType_t::RESPONSE);
-    DEBUG_PRINTLN (F("writeCoil(): Writing coil successful."));
+    DEBUG_PRINTLN (F("writeCoil [OK]: Writing coil successful."));
     return MODBUS_FC_WRITE_SINGLE_COIL;
   }
   else if (response.getFunctionCode() > 0x80) { // If the server responded with an exception
     response.setType (CSE_ModbusRTU_ADU::aduType_t::EXCEPTION);
-    DEBUG_PRINTLN (F("writeCoil(): Received exception response!"));
+    DEBUG_PRINTLN (F("writeCoil [ERROR]: Received exception response!"));
     return response.getExceptionCode();
   }
 
-  DEBUG_PRINTLN (F("writeCoil(): Writing failed!"));
+  DEBUG_PRINTLN (F("writeCoil [ERROR]: Writing failed!"));
   
   return -1;
 }
