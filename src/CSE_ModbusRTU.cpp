@@ -9,7 +9,7 @@
   Version: 0.0.9
   License: MIT
   Source: https://github.com/CIRCUITSTATE/CSE_ModbusRTU
-  Last Modified: +05:30 19:09:06 PM 28-05-2025, Wednesday
+  Last Modified: +05:30 08:45:36 AM 27-11-2025, Thursday
  */
 //======================================================================================//
 
@@ -909,12 +909,12 @@ bool CSE_ModbusRTU_Server:: begin() {
  * @return int - Function code, or -1 if the operation fails.
  */
 int CSE_ModbusRTU_Server:: poll() {
-  // First received a new ADU from the client
+  // First, receive a new ADU from the client.
   if (receive() < 0) {
     return -1;
   }
 
-  // Now check if the address of the request matches the address of the server
+  // Now check if the address of the request matches the address of the server.
   if (request.getDeviceAddress() != rtu->deviceAddress) {
     DEBUG_PRINTLN (F("poll(): Server addresses does not match."));
     return -1;
@@ -927,13 +927,13 @@ int CSE_ModbusRTU_Server:: poll() {
     return -1;
   }
 
-  // Now check what type of function code was received
+  // Now check what type of function code was received.
   switch (request.getFunctionCode()) {
     case MODBUS_FC_READ_COILS: {
       // Check if the coil count is valid (the maximum in a request is 0x07D0) or
       // if all of the coils in the range are present in the server.
       if ((request.getQuantity() > 0x07D0) || (!isCoilPresent (request.getStartingAddress(), request.getQuantity()))) {
-        // Then process an exception
+        // Then process an exception.
         response.resetLength(); // Reset the response length
         response.setDeviceAddress (rtu->deviceAddress); // Set the address of the response
         response.setFunctionCode (MODBUS_FC_READ_COILS); // Set the function code of the response
@@ -941,7 +941,7 @@ int CSE_ModbusRTU_Server:: poll() {
         response.setExceptionCode (MODBUS_EX_ILLEGAL_DATA_VALUE); // Set the exception code
         response.setCRC(); // Set the CRC of the response
         send(); // Send the response
-        return MODBUS_FC_READ_COILS + 0x80; // Return exception function code
+        return MODBUS_FC_READ_COILS + 0x80; // Return the exception function code
       }
 
       DEBUG_PRINT (F("poll(): Received request to read coils 0x"));
